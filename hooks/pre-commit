@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Get the current branch name
+BRANCH_NAME=$(git branch --show-current)
+
+# Debug print statement
+echo "Branch name: '$BRANCH_NAME'"
+
+# Initialize error flag
+BRANCH_NAME_ERROR=0
+
+# Validate branch name format
+if ! [[ $BRANCH_NAME =~ ^(feature|setup|release|hotfix)/issue-[0-9]+\.[0-9]+-[a-zA-Z0-9_-]+$ ]]; then
+  echo "Error: Branch name '$BRANCH_NAME' format is incorrect." >&2
+  echo "Please use one of the following formats:" >&2
+  echo "  feature/issue-<issue_number>-<feature_name>" >&2
+  echo "  setup/issue-<issue_number>-<setup_name>" >&2
+  echo "  release/issue-<issue_number>-<release_name>" >&2
+  echo "  hotfix/issue-<issue_number>-<hotfix_name>" >&2
+  echo "Example:" >&2
+  echo "  feature/issue-1.1-basic-html-parser" >&2
+  BRANCH_NAME_ERROR=1
+fi
+
+# Check if there were any errors
+if [ $BRANCH_NAME_ERROR -eq 1 ]; then
+  echo -e "\nCommit failed due to the above errors." >&2
+  exit 1
+fi
+
+# If branch name format is valid, allow the commit to proceed
+echo "Branch name format is valid. Proceeding with commit."

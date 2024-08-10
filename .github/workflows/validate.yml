@@ -1,0 +1,62 @@
+name: Validate Commit Message and Branch Name
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Validate Commit Message
+        run: |
+          echo "Checking commit message format..."
+          COMMIT_MSG=$(git log -1 --pretty=%B | xargs)  # Get the last commit message and trim whitespace
+          echo "Commit message: '$COMMIT_MSG'"
+
+          # Skip validation for merge commits
+          if [[ $COMMIT_MSG =~ ^Merge ]]; then
+            echo "Merge commit detected. Skipping commit message validation."
+            exit 0
+          fi
+
+          COMMIT_MSG_REGEX="^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-zA-Z0-9_-]+\))?:\ .+"
+          if ! [[ $COMMIT_MSG =~ $COMMIT_MSG_REGEX ]]; then
+            echo -e "\nError: Commit message format is incorrect."
+            echo "Please use one of the following formats:"
+            echo "1. <type>: <subject>"
+            echo "2. <type>(<scope>): <subject>"
+            echo "Examples:"
+            echo "  feat: clear commit msg"
+            echo -e "  feat(frontend): clear commit msg\n"
+            echo "Available types: feat, fix, docs, style, refactor, perf, test, chore"
+            echo "Available scopes: account-management, class-management, subject-management, topic-management, question-management, quiz, result-management, ui-ux, database, backend, frontend, integration, security, testing, deployment"
+            echo -e "\nLearn more from CONTRIBUTING.md file.\n"
+            exit 1
+          fi
+
+      - name: Validate Branch Name
+        run: |
+          echo "Checking branch name format..."
+          BRANCH_NAME=${{ github.head_ref }}
+          echo "Branch name: '$BRANCH_NAME'"
+          if ! [[ $BRANCH_NAME =~ ^(feature|setup|release|hotfix)/issue-[0-9]+\.[0-9]+-[a-zA-Z0-9_-]+$ ]]; then
+            echo "Error: Branch name format is incorrect."
+            echo "Please use one of the following formats:"
+            echo "  feature/issue-<issue_number>-<feature_name>"
+            echo "  setup/issue-<issue_number>-<setup_name>"
+            echo "  release/issue-<issue_number>-<release_name>"
+            echo "  hotfix/issue-<issue_number>-<hotfix_name>"
+            echo "Example:"
+            echo "  feature/issue-1.1-basic-html-parser"
+            exit 1
+          fi

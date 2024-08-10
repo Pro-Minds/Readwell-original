@@ -1,0 +1,25 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE" | xargs)  # Trim leading and trailing whitespace
+
+# Define available types and scopes
+TYPES="feat, fix, docs, style, refactor, perf, test, chore"
+SCOPES="account-management, class-management, subject-management, topic-management, question-management, quiz, result-management, ui-ux, database, backend, frontend, integration, security, testing, deployment"
+
+# Debug print statement
+echo "Commit message: '$COMMIT_MSG'"
+
+# Updated regex to match the specified formats
+if ! [[ $COMMIT_MSG =~ ^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-zA-Z0-9_-]+\))?:\ .+ ]]; then
+  echo -e "\nError: Commit message format is incorrect." >&2
+  echo "Please use one of the following formats:" >&2
+  echo "1. <type>: <subject>" >&2
+  echo "2. <type>(<scope>): <subject>" >&2
+  echo "Examples:" >&2
+  echo "  feat: clear commit msg" >&2
+  echo -e "  feat(frontend): clear commit msg\n" >&2
+  echo "Available types: $TYPES" >&2
+  echo -e "Available scopes: $SCOPES\nLearn more from CONTRIBUTING.md file.\n" >&2
+  exit 1
+fi
