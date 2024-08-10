@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: backend-readwell
+  datasource:
+    url: jdbc:postgresql://localhost:5432/readwell-db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
