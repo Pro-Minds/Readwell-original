@@ -8,11 +8,8 @@ To make it easy for you to get started with this project, please read `CONTRIBUT
 
 ## Required Dependencies
 
-To run this program make sure to insta
-- docker, docker-compose, java17
-```shell
-    npm install -g @angular/cli
-```
+To run this program make sure to install
+- docker, docker-compose, java17, node and npm
 
 ## Run applications
 
@@ -24,7 +21,9 @@ cd backend-readwell
 ```shell
 docker-compose up -d
 ```
-- to make sure the database is up run `psql -h localhost -p 5432 -U admin -d readwell-db`
+- to make sure the database is up run `psql -h localhost -p 5432 -U admin -d readwell-db` or `docker exec -it postgres_db psql -U admin -d readwell-db
+`
+- to check to see that a test table has been created `\dt`
 
 **Spring-boot module**
 
@@ -35,9 +34,10 @@ cd backend-readwell
 mvn spring-boot:run
 ```
 - navigate to [http://localhost:8080/api/hello](http://localhost:8080/api/hello)
-if you see: `Hello from Spring Boot!`, it means the backend app is running
+if you see: `["Hello from the database!"]`, it means the backend app is running
 
-**Angular module**
+
+**React module**
 
 ```shell
 cd frontend-readwell
@@ -49,4 +49,9 @@ npm install
 ng serve
 ```
 - navigate to [http://localhost:4200](http://localhost:4200)
-  if you see: `Hello from Spring Boot!`, it means the angular module is connected to spring-boot module.
+  if you see:
+```angular2html
+Data from Spring Boot:
+Hello from the database!
+```
+- it means the react module is connected to spring-boot module.
