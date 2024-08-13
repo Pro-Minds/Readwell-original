@@ -34,31 +34,30 @@ export const registerUser = async (userData) => {
     }
 };
 
-// export const verifyOtp = async ({ email, otp }) => {
-//     try {
-//         const response = await axios.post(`${API_URL}/admin/verify-otp`, { email, otp });
-//         return response.data; // Assuming the token is returned in the response data
-//     } catch (error) {
-//         throw new Error(error.response.data.message || 'Error verifying OTP');
-//     }
-// };
-//
-// export const loginUser = async (loginData) => {
-//     try {
-//         const response = await axios.post(`${API_URL}/admin/login`, loginData, {
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             // withCredentials: true
-//         });
-//         if (response.status !== 200) {
-//             throw new Error('Login failed');
-//         }
-//         return response.data; // Return the JWT token or any other relevant data
-//     } catch (error) {
-//         console.error('Error during login:', error);
-//         throw error; // Propagate the error for handling in the component
-//     }
-// };
+export const verifyOtp = async ({ email, otp }) => {
+    try {
+        const response = await axios.post(`${API_URL}/admin/verify-otp`, { email, otp });
+        return response.data; // Assuming the token is returned in the response data
+    } catch (error) {
+        throw new Error(error.response.data.message || 'Error verifying OTP');
+    }
+};
+
+export const loginUser = async (loginData) => {
+    try {
+        const response = await axios.post(`${API_URL}/admin/login`, loginData, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (response.status !== 200) {
+            throw new Error('Login failed');
+        }
+        return response.data.token; // Return the JWT token
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw new Error(error.response?.data || 'Error during login'); // Propagate the error for handling in the component
+    }
+};
 
 
