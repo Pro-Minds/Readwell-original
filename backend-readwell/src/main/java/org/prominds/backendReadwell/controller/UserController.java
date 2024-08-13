@@ -29,8 +29,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @Autowired
-//    private JwtUtil jwtUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private OtpService otpService;
@@ -38,7 +38,7 @@ public class UserController {
     @Autowired
     private GeneratedOtpRepository generatedOtpRepository;
 
-//    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
     @PostMapping("/admin/register")
@@ -71,48 +71,48 @@ public class UserController {
         return ResponseEntity.ok("User registered successfully. Please check your email for the OTP.");
     }
 
-//    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-//    @PostMapping("/admin/verify-otp")
-//    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            return ResponseEntity.badRequest().body("Invalid OTP data");
-//        }
-//
-//        // Validate OTP using OtpService
-//        boolean isValid = otpService.validateOtp(otpDto.getEmail(), otpDto.getOtp());
-//        if (!isValid) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
-//        }
-//
-//        // Generate a new JWT token for the user
-//        String token = jwtUtil.generateToken(otpDto.getEmail());
-//        return ResponseEntity.ok(token);
-//    }
-//
-//    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-//    @PostMapping("/admin/login")
-//    public ResponseEntity<String> adminLogin(@RequestBody UserLoginDto loginDto) {
-//        logger.info("Login attempt for email: {}", loginDto.getEmail());
-//
-//        // Retrieve the user by email
-//        User user = userService.getUserByEmail(loginDto.getEmail());
-//        if (user == null) {
-//            logger.warn("User not found for email: {}", loginDto.getEmail());
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-//        }
-//
-//        logger.info("User found: {}", user.getEmail());
-//
-//        // Check if password matches
-//        boolean passwordMatches = userService.matchesPassword(loginDto.getPassword(), user.getPassword());
-//        if (!passwordMatches) {
-//            logger.warn("Invalid password for email: {}", loginDto.getEmail());
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
-//        }
-//
-//        // Generate a new JWT token for the user
-//        String token = jwtUtil.generateToken(user.getEmail());
-//        logger.info("Login successful for email: {}", loginDto.getEmail());
-//        return ResponseEntity.ok(token);
-//    }
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @PostMapping("/admin/verify-otp")
+    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("Invalid OTP data");
+        }
+
+        // Validate OTP using OtpService
+        boolean isValid = otpService.validateOtp(otpDto.getEmail(), otpDto.getOtp());
+        if (!isValid) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
+        }
+
+        // Generate a new JWT token for the user
+        String token = jwtUtil.generateToken(otpDto.getEmail());
+        return ResponseEntity.ok(token);
+    }
+
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @PostMapping("/admin/login")
+    public ResponseEntity<String> adminLogin(@RequestBody UserLoginDto loginDto) {
+        logger.info("Login attempt for email: {}", loginDto.getEmail());
+
+        // Retrieve the user by email
+        User user = userService.getUserByEmail(loginDto.getEmail());
+        if (user == null) {
+            logger.warn("User not found for email: {}", loginDto.getEmail());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        }
+
+        logger.info("User found: {}", user.getEmail());
+
+        // Check if password matches
+        boolean passwordMatches = userService.matchesPassword(loginDto.getPassword(), user.getPassword());
+        if (!passwordMatches) {
+            logger.warn("Invalid password for email: {}", loginDto.getEmail());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+        }
+
+        // Generate a new JWT token for the user
+        String token = jwtUtil.generateToken(user.getEmail());
+        logger.info("Login successful for email: {}", loginDto.getEmail());
+        return ResponseEntity.ok(token);
+    }
 }
