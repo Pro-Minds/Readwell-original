@@ -37,13 +37,13 @@ public class OtpService {
         mailSender.send(message);
     }
 
-//    public boolean validateOtp(String email, String otp) {
-//        GeneratedOtp generatedOtp = generatedOtpRepository.findByEmail(email);
-//        if (generatedOtp != null && generatedOtp.getOtp().equals(otp)) {
-//            // delete the OTP after successful verification
-//            generatedOtpRepository.delete(generatedOtp);
-//            return true;
-//        }
-//        return false;
-//    }
+    public boolean validateOtp(String email, String otp) {
+        GeneratedOtp generatedOtp = generatedOtpRepository.findByEmail(email);
+        if (generatedOtp != null && generatedOtp.getOtp().equals(otp)) {
+            // delete the OTP after successful verification
+            generatedOtpRepository.delete(generatedOtp);
+            return true;
+        }
+        return false;
+    }
 }

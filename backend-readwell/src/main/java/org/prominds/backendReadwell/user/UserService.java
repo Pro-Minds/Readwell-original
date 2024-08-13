@@ -25,15 +25,15 @@ public class UserService {
         userRepository.save(user);
     }
 
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll();
-//    }
-//
-//    public User getUserByEmail(String email) {
-//        return userRepository.findByEmail(email);
-//    }
-//
-//    public boolean matchesPassword(String rawPassword, String encodedPassword) {
-//        return passwordEncoder.matches(rawPassword, encodedPassword);
-//    }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public boolean matchesPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 }
