@@ -15,6 +15,15 @@ services:
     networks:
       - readwell-net
 
+  mail-dev:
+    container_name: readwell-mail-dev
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - readwell-net
+
 volumes:
   postgres_data:
 

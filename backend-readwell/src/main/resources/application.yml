@@ -1,6 +1,10 @@
 spring:
   application:
     name: backend-readwell
+    security:
+      jwt:
+        secret-key: xPaGg4XP2BF7t88wPCRwS78m36KQ06gf0TTjkAam/Viuvq1L2nagwW3HS36r0m/Sfjz/7ZXQjhEv9D24uVtZ2w==
+        expiration: 3600000 # 1 hour in milliseconds
   datasource:
     url: jdbc:postgresql://localhost:5432/readwell-db
     username: admin
@@ -8,8 +12,32 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   sql:
     init:
       mode: always
+  security:
+    user:
+      password: test
+      name: test
+  mail:
+    host: localhost
+    port: 1025
+    username: ulga
+    password: ulga
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enable: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.mail: DEBUG
