@@ -12,8 +12,8 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/admin/register" element={<RegistrationForm />} />
-                {/*<Route path="/admin/login" element={<LoginForm />} />*/}
-                {/*<Route path="/admin/verify-otp" element={<OTPVerification />} />*/}
+                <Route path="/admin/login" element={<LoginForm />} />
+                <Route path="/admin/verify-otp" element={<OTPVerification />} />
                 <Route
                     path="/admin"
                     element={
@@ -22,7 +22,7 @@ const App = () => {
                         </ProtectedRoute>
                     }
                 />
-                {/*<Route path="/unauthenticated" element={<Unauthenticated />} />*/}
+                <Route path="/unauthenticated" element={<Unauthenticated />} />
             </Routes>
         </Router>
     );
