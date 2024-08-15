@@ -85,7 +85,8 @@ public class UserController {
         }
 
         // Generate a new JWT token for the user
-        String token = jwtUtil.generateToken(otpDto.getEmail());
+        User user = userService.getUserByEmail(otpDto.getEmail()); // Retrieve user
+        String token = jwtUtil.generateToken(user); // Pass the user object
         return ResponseEntity.ok(token);
     }
 
@@ -111,8 +112,21 @@ public class UserController {
         }
 
         // Generate a new JWT token for the user
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user); // Pass the user object
         logger.info("Login successful for email: {}", loginDto.getEmail());
+//        logger.info("User roles: {}", user.getRoles());
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/admin/refresh-token")
+    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
+        if (jwtUtil.isTokenExpired(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+        }
+        // Generate a new token
+        String email = jwtUtil.extractUsername(token);
+        User user = userService.getUserByEmail(email);
+        String newToken = jwtUtil.generateToken(user);
+        return ResponseEntity.ok(newToken);
     }
 }
