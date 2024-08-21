@@ -2,6 +2,7 @@ package org.prominds.backendReadwell.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.prominds.backendReadwell.user.CustomUserDetailsService;
@@ -25,13 +26,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
+        String jwt = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("token".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         String email = null;
-        String jwt = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        if (jwt != null) {
             email = jwtUtil.extractUsername(jwt);
         }
 
@@ -41,9 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else if (jwtUtil.isTokenExpired(jwt)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired. Please log in again.");
+                return; // Stop further processing
             }
         }
 
         filterChain.doFilter(request, response);
     }
+
 }
