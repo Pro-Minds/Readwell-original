@@ -127,16 +127,37 @@ public class UserController {
         return ResponseEntity.ok("Token generated and stored in cookie.");
     }
 
-
-    @PostMapping("/admin/refresh-token")
-    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
-        if (jwtUtil.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-        }
-        // Generate a new token
-        String email = jwtUtil.extractUsername(token);
-        User user = userService.getUserByEmail(email);
-        String newToken = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(newToken);
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @GetMapping("/admin/check-auth")
+    public ResponseEntity<String> checkAuth() {
+        return ResponseEntity.ok("User is authenticated");
     }
+
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @PostMapping("/admin/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        // Invalidate the JWT token by setting its cookie to expire immediately
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // This will remove the cookie
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Successfully logged out.");
+    }
+
+
+
+//    @PostMapping("/admin/refresh-token")
+//    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
+//        if (jwtUtil.isTokenExpired(token)) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+//        }
+//        // Generate a new token
+//        String email = jwtUtil.extractUsername(token);
+//        User user = userService.getUserByEmail(email);
+//        String newToken = jwtUtil.generateToken(user);
+//        return ResponseEntity.ok(newToken);
+//    }
 }
