@@ -1,28 +1,25 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import RegistrationForm from './components/RegistrationForm';
 import LoginForm from './components/LoginForm';
 import AdminPanel from './components/admin/AdminPanel';
-import ProtectedRoute from './security/ProtectedRoute';
-import Unauthenticated from './security/Unauthenticated';
 import OTPVerification from './components/OTPVerification';
+import ProtectedRoute from './security/ProtectedRoute';
 
 const App = () => {
     return (
         <Router>
             <Routes>
+                {/*<Route path="/" element={<Navigate to="/admin/login" replace />} />*/}
                 <Route path="/admin/register" element={<RegistrationForm />} />
                 <Route path="/admin/login" element={<LoginForm />} />
                 <Route path="/admin/verify-otp" element={<OTPVerification />} />
                 <Route
-                    path="/admin"
-                    element={
-                        <ProtectedRoute>
-                            <AdminPanel />
-                        </ProtectedRoute>
-                    }
+                    path="/admin/panel"
+                    element={<ProtectedRoute component={AdminPanel} />}
                 />
-                <Route path="/unauthenticated" element={<Unauthenticated />} />
+                {/* Catch-all route */}
+                <Route path="*" element={<Navigate to="/admin/login" replace />} />
             </Routes>
         </Router>
     );
