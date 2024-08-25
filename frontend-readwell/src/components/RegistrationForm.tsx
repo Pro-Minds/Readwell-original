@@ -1,7 +1,7 @@
 // src/components/RegistrationForm.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../apiService';
+import { registerUser } from '../services/apiService';
 import {AxiosError} from "axios";
 
 const RegistrationForm = () => {

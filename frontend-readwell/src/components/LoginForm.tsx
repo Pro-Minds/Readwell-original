@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../apiService';
+import { loginUser } from '../services/apiService';
 import {AxiosError} from "axios";
 
 const LoginForm = () => {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logout } from './security/AuthService'
+import { logout } from '../security/AuthService'
 
 const API_URL = 'http://10.49.63.86:8080/api';
 

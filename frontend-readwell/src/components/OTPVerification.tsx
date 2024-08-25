@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { verifyOtp } from 'apiService';
+import { verifyOtp } from '../services/apiService';
 import { AxiosError } from 'axios';
 
 interface LocationState {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../apiService';
+import { isAuthenticated } from '../services/apiService';
 
 interface ProtectedRouteProps {
     component: React.ComponentType;
