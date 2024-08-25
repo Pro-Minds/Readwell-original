@@ -1,21 +1,21 @@
 package org.prominds.backendReadwell.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.prominds.backendReadwell.otp.GeneratedOtp;
 import org.prominds.backendReadwell.otp.GeneratedOtpRepository;
 import org.prominds.backendReadwell.otp.OtpService;
 import org.prominds.backendReadwell.otp.OtpVerificationDto;
-import org.prominds.backendReadwell.user.User;
-import org.prominds.backendReadwell.user.UserLoginDto;
-import org.prominds.backendReadwell.user.UserRegistrationDto;
-import org.prominds.backendReadwell.user.UserService;
-import org.prominds.backendReadwell.otp.OtpService;
+import org.prominds.backendReadwell.user.*;
 import org.prominds.backendReadwell.security.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -37,6 +37,9 @@ public class UserController {
 
     @Autowired
     private GeneratedOtpRepository generatedOtpRepository;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -73,7 +76,7 @@ public class UserController {
 
     @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
     @PostMapping("/admin/verify-otp")
-    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult) {
+    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("Invalid OTP data");
         }
@@ -85,21 +88,25 @@ public class UserController {
         }
 
         // Generate a new JWT token for the user
-        User user = userService.getUserByEmail(otpDto.getEmail()); // Retrieve user
-        String token = jwtUtil.generateToken(user); // Pass the user object
-        return ResponseEntity.ok(token);
+        User user = userService.getUserByEmail(otpDto.getEmail());
+        String token = jwtUtil.generateToken(user);
+
+        // Set token in a cookie
+        authUtil.setTokenInCookie(token, response);
+
+        return ResponseEntity.ok("Token generated and stored in cookie.");
     }
 
     @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
     @PostMapping("/admin/login")
-    public ResponseEntity<String> adminLogin(@RequestBody UserLoginDto loginDto) {
+    public ResponseEntity<String> adminLogin(@RequestBody UserLoginDto loginDto, HttpServletResponse response) {
         logger.info("Login attempt for email: {}", loginDto.getEmail());
 
         // Retrieve the user by email
         User user = userService.getUserByEmail(loginDto.getEmail());
         if (user == null) {
             logger.warn("User not found for email: {}", loginDto.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            throw new UsernameNotFoundException("User not found with email: " + loginDto.getEmail());
         }
 
         logger.info("User found: {}", user.getEmail());
@@ -108,25 +115,49 @@ public class UserController {
         boolean passwordMatches = userService.matchesPassword(loginDto.getPassword(), user.getPassword());
         if (!passwordMatches) {
             logger.warn("Invalid password for email: {}", loginDto.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+            throw new BadCredentialsException("Invalid password");
         }
 
         // Generate a new JWT token for the user
-        String token = jwtUtil.generateToken(user); // Pass the user object
-        logger.info("Login successful for email: {}", loginDto.getEmail());
-//        logger.info("User roles: {}", user.getRoles());
-        return ResponseEntity.ok(token);
+        String token = jwtUtil.generateToken(user);
+
+        // Set token in a cookie
+        authUtil.setTokenInCookie(token, response);
+
+        return ResponseEntity.ok("Token generated and stored in cookie.");
     }
 
-    @PostMapping("/admin/refresh-token")
-    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
-        if (jwtUtil.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-        }
-        // Generate a new token
-        String email = jwtUtil.extractUsername(token);
-        User user = userService.getUserByEmail(email);
-        String newToken = jwtUtil.generateToken(user);
-        return ResponseEntity.ok(newToken);
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @GetMapping("/admin/check-auth")
+    public ResponseEntity<String> checkAuth() {
+        return ResponseEntity.ok("User is authenticated");
     }
+
+    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+    @PostMapping("/admin/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        // Invalidate the JWT token by setting its cookie to expire immediately
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // This will remove the cookie
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Successfully logged out.");
+    }
+
+
+
+//    @PostMapping("/admin/refresh-token")
+//    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
+//        if (jwtUtil.isTokenExpired(token)) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+//        }
+//        // Generate a new token
+//        String email = jwtUtil.extractUsername(token);
+//        User user = userService.getUserByEmail(email);
+//        String newToken = jwtUtil.generateToken(user);
+//        return ResponseEntity.ok(newToken);
+//    }
 }

@@ -1,10 +1,9 @@
 package org.prominds.backendReadwell.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.prominds.backendReadwell.exceptions.TokenExpiredException;
 import org.prominds.backendReadwell.user.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,10 +39,24 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, String email) {
-        final String extractedEmail = extractUsername(token);
-        return (extractedEmail.equals(email) && !isTokenExpired(token));
+    public boolean validateToken(String token, String email) {
+        try {
+            // Check if the token is expired and validate it
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // Optionally, check if the email in the token matches the provided email
+            return claims.getSubject().equals(email);
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException("Token has expired. Please log in again.");
+        } catch (JwtException | IllegalArgumentException e) {
+            return false; // Token is invalid
+        }
     }
+
 
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
@@ -65,4 +78,14 @@ public class JwtUtil {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject(); // Assuming the subject is the email
+    }
+
 }
