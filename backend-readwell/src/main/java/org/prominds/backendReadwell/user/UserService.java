@@ -13,14 +13,6 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void registerUser(UserRegistrationDto registrationDto) {
-        User user = new User();
-        user.setEmail(registrationDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Encrypt password
-        user.setAdmin(false);
-        userRepository.save(user);
-    }
-
     public void saveUser(User user) {
         userRepository.save(user);
     }

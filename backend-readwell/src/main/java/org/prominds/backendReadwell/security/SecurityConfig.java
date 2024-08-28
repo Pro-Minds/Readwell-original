@@ -34,7 +34,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorization -> authorization
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("/api/admin/register", "/api/admin/verify-otp", "/api/admin/login").permitAll()
+                        .requestMatchers(
+                                "/api/admin/register",
+                                "/api/admin/verify-otp",
+                                "/api/admin/login",
+                                "/api/register",
+                                "/api/verify-otp",
+                                "/api/login"
+                        ).permitAll()
                         .requestMatchers("/api/admin/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session

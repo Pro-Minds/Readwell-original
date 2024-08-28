@@ -31,24 +31,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (jwt != null) {
             try {
-                // Validate the token and extract email
                 String email = jwtUtil.getEmailFromToken(jwt);
                 if (jwtUtil.validateToken(jwt, email)) {
-                    // Load user details
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                    // Set authentication in the context
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (TokenExpiredException e) {
-                // Handle expired token case (optional: log the error)
+                // Token expired handling
+                jwtUtil.invalidateToken(response);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-                return; // Stop further processing
+                return;
             } catch (Exception e) {
-                // Handle other exceptions (optional: log the error)
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token.");
-                return; // Stop further processing
+                return;
             }
         }
 
