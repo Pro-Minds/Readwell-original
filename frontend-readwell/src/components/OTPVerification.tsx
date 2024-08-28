@@ -1,94 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { verifyOtp } from '../services/apiService';
-import { AxiosError } from 'axios';
-
-interface LocationState {
-    email?: string;
-}
+import { getUserRole, verifyOtp } from '../services/apiService';
+import { getCookie } from '../security/AuthService'; // Import cookie utility
 
 const OTPVerification: React.FC = () => {
-    const [formData, setFormData] = useState<{ email: string; otp: string }>({
-        email: '',
-        otp: '',
-    });
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [otp, setOtp] = useState('');
     const navigate = useNavigate();
-    const location = useLocation(); // No type argument
+    const location = useLocation();
+    const email = new URLSearchParams(location.search).get('email');
 
-    useEffect(() => {
-        const state = location.state as LocationState; // Type assertion
-        if (state?.email) {
-            setFormData(prevData => ({
-                ...prevData,
-                email: state.email || '', // Ensure email is a string
-            }));
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!email) {
+            console.error('Email is required for OTP verification');
+            return;
         }
-    }, [location.state]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData(prevData => ({
-            ...prevData,
-            [e.target.name]: e.target.value,
-        }));
-        setError('');
-    };
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
 
         try {
-            await verifyOtp(formData);
-            alert('OTP verified successfully!');
-            navigate('/admin/panel');
-        } catch (err) {
-            console.error('OTP verification error:', err);
-            if (err instanceof AxiosError) { // Check for AxiosError
-                setError(err.response?.data || 'Invalid OTP. Please try again.');
+            console.log('Submitting OTP:', otp);
+            await verifyOtp({ email, otp });
+
+            const token = getCookie('token');
+            if (token) {
+                console.log('Token found:', token);
+                const role = await getUserRole(token); // Ensure token is defined
+                if (role === 'ADMIN') {
+                    navigate('/admin/panel'); // Redirect to admin panel
+                } else {
+                    navigate('/'); // Redirect to user dashboard or home
+                }
             } else {
-                setError('Invalid OTP. Please try again.');
+                console.error('Token not found');
             }
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            console.error('OTP verification failed:', error);
         }
     };
 
     return (
-        <div>
-            <h2>OTP Verification</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        readOnly={!!(location.state as LocationState)?.email}
-                    />
-                </div>
-                <div>
-                    <label>OTP:</label>
-                    <input
-                        type="text"
-                        name="otp"
-                        value={formData.otp}
-                        onChange={handleChange}
-                        required
-                        maxLength={6}
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Verifying...' : 'Verify OTP'}
-                </button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </form>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+                placeholder="Enter OTP"
+            />
+            <button type="submit">Verify OTP</button>
+        </form>
     );
 };
 

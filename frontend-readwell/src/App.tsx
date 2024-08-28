@@ -9,24 +9,26 @@ import TopicManager from './components/admin/TopicManager';
 import QuestionManager from './components/admin/QuestionManager';
 import OTPVerification from './components/OTPVerification';
 import ProtectedRoute from './security/ProtectedRoute';
+import HomePage from "./components/user/HomePage";
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                {/*<Route path="/" element={<Navigate to="/admin/login" replace />} />*/}
                 <Route path="/admin/register" element={<RegistrationForm />} />
+                <Route path="/register" element={<RegistrationForm />} />
                 <Route path="/admin/login" element={<LoginForm />} />
+                <Route path="/login" element={<LoginForm />} />
                 <Route path="/admin/verify-otp" element={<OTPVerification />} />
+                <Route path="/verify-otp" element={<OTPVerification />} />
                 <Route
                     path="/admin/panel"
                     element={<ProtectedRoute component={AdminPanel} />}
                 />
-                {/* Catch-all route */}
-                <Route path="*" element={<Navigate to="/admin/login" replace />} />                <Route
-                path="/admin/manage-klasses"
-                element={<ProtectedRoute component={KlassManager} />}
-            />
+                <Route
+                    path="/admin/manage-klasses"
+                    element={<ProtectedRoute component={KlassManager} />}
+                />
                 <Route
                     path="/admin/manage-subjects"
                     element={<ProtectedRoute component={SubjectManager} />}
@@ -39,6 +41,7 @@ const App = () => {
                     path="/admin/manage-questions"
                     element={<ProtectedRoute component={QuestionManager} />}
                 />
+                <Route path="/" element={<HomePage />} />  {/* Ensure you have a home page */}
                 <Route path="*" element={<Navigate to="/admin/login" replace />} />
             </Routes>
         </Router>

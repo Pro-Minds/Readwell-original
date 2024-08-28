@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../services/apiService';
+import { isAuthenticated } from '../services/apiService'; // Ensure this uses the cookie
+import { isTokenExpired} from "../security/AuthService";
 
 interface ProtectedRouteProps {
     component: React.ComponentType;
@@ -15,7 +16,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component })
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const auth = await isAuthenticated();
+                // Check if the token is expired
+                if (isTokenExpired()) {
+                    setAuthStatus({ loading: false, isAuth: false });
+                    return;
+                }
+                // Use the API to check authentication or check the token directly
+                const auth = await isAuthenticated(); // This should check the cookie
                 setAuthStatus({ loading: false, isAuth: auth });
             } catch (error) {
                 console.error('Authentication check failed:', error);

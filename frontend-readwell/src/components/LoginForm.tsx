@@ -1,79 +1,56 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/apiService';
-import {AxiosError} from "axios";
+import { getUserRole, loginUser } from '../services/apiService';
+import { getCookie } from '../security/AuthService'; // Import cookie utility
 
-const LoginForm = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+const LoginForm: React.FC = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-        setError(''); // Clear errors on input change
-    };
-
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
         try {
-            await loginUser(formData);
-            alert('Login successful!');
-            navigate('/admin/panel');
-        } catch (err) {
-            console.error('Login error:', err);
-            if (err instanceof AxiosError) {
-                setError(err.response?.data || 'Login failed. Please check your credentials.');
-            } else {
-                setError('Login failed. Please check your credentials.');
-            }
-        } finally {
-            setLoading(false);
+            await loginUser({ email, password });
+
+            // Wait a moment for the cookie to be set
+            setTimeout(async () => {
+                const token = getCookie('token');
+                if (token) {
+                    const role = await getUserRole(token);
+                    if (role === 'ADMIN') {
+                        navigate('/admin/panel');
+                    } else {
+                        navigate('/');
+                    }
+                } else {
+                    console.error('Token not found');
+                }
+            }, 1000); // Adjust the timeout as necessary
+
+        } catch (error) {
+            console.error('Login failed:', error);
         }
     };
 
-
     return (
-        <div>
-            <h2>Admin Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        minLength={6}
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </form>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Email"
+            />
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Password"
+            />
+            <button type="submit">Login</button>
+        </form>
     );
 };
 
