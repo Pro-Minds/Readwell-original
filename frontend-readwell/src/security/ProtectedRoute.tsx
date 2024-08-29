@@ -1,43 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { isAuthenticated } from '../services/apiService'; // Ensure this uses the cookie
-import { isTokenExpired} from "../security/AuthService";
+import { checkAuth } from '../services/apiService'; // Use the new checkAuth function
 
 interface ProtectedRouteProps {
     component: React.ComponentType;
+    allowedRoles: string[]; // Accept an array of allowed roles
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component, allowedRoles }) => {
     const [authStatus, setAuthStatus] = useState({
         loading: true,
         isAuth: false,
+        role: '', // Initialize role as an empty string
     });
 
     useEffect(() => {
-        const checkAuth = async () => {
+        const checkAuthStatus = async () => {
             try {
-                // Check if the token is expired
-                if (isTokenExpired()) {
-                    setAuthStatus({ loading: false, isAuth: false });
-                    return;
-                }
-                // Use the API to check authentication or check the token directly
-                const auth = await isAuthenticated(); // This should check the cookie
-                setAuthStatus({ loading: false, isAuth: auth });
+                const { isAuthenticated, role = '' } = await checkAuth(); // Provide a default value for role
+                setAuthStatus({ loading: false, isAuth: isAuthenticated, role });
             } catch (error) {
                 console.error('Authentication check failed:', error);
-                setAuthStatus({ loading: false, isAuth: false });
+                setAuthStatus({ loading: false, isAuth: false, role: '' });
             }
         };
 
-        checkAuth();
-    }, []); // Empty dependency array ensures this runs only once on mount
+        checkAuthStatus();
+    }, []);
 
     if (authStatus.loading) {
-        return <div>Loading...</div>; // Or a spinner component
+        return <div>Loading...</div>;
     }
 
-    return authStatus.isAuth ? <Component /> : <Navigate to="/admin/login" replace />;
+    // Check if the user role is allowed
+    if (authStatus.isAuth && allowedRoles.includes(authStatus.role)) {
+        return <Component />;
+    }
+
+    return <Navigate to="/admin/login" replace />;
 };
 
 export default ProtectedRoute;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getUserRole, verifyOtp } from '../services/apiService';
-import { getCookie } from '../security/AuthService'; // Import cookie utility
 
 const OTPVerification: React.FC = () => {
     const [otp, setOtp] = useState('');
@@ -17,20 +16,12 @@ const OTPVerification: React.FC = () => {
         }
 
         try {
-            console.log('Submitting OTP:', otp);
             await verifyOtp({ email, otp });
-
-            const token = getCookie('token');
-            if (token) {
-                console.log('Token found:', token);
-                const role = await getUserRole(token); // Ensure token is defined
-                if (role === 'ADMIN') {
-                    navigate('/admin/panel'); // Redirect to admin panel
-                } else {
-                    navigate('/'); // Redirect to user dashboard or home
-                }
+            const role = await getUserRole(); // Get the user role after OTP verification
+            if (role === 'ADMIN') {
+                navigate('/admin/panel');
             } else {
-                console.error('Token not found');
+                navigate('/'); // Redirect to user dashboard or home
             }
         } catch (error) {
             console.error('OTP verification failed:', error);

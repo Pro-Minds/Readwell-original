@@ -13,15 +13,6 @@ public class AuthUtil {
     @Value("${spring.application.security.jwt.expiration}")
     private long expirationTime;
 
-//    public void setTokenInCookie(String token, HttpServletResponse response) {
-//        Cookie cookie = new Cookie("token", token);
-//        cookie.setHttpOnly(true);
-////        cookie.setSecure(true);
-//        cookie.setPath("/");
-//        cookie.setMaxAge((int) (expirationTime / 1000)); // Convert milliseconds to seconds
-//        response.addCookie(cookie);
-//    }
-
     public void setTokenInCookie(String token, HttpServletResponse response) {
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);

@@ -38,11 +38,15 @@ public class SecurityConfig {
                                 "/api/admin/register",
                                 "/api/admin/verify-otp",
                                 "/api/admin/login",
+                                "/api/admin/logout",
                                 "/api/register",
                                 "/api/verify-otp",
                                 "/api/login"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers(
+                                "/api/admin/**",
+                                "/api/check-auth"
+                        ).authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

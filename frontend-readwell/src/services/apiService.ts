@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { logout } from '../security/AuthService';
 import { User } from "../services/types";
-import { isTokenExpired } from '../security/AuthService';
 
 const API_URL = 'http://10.49.63.86:8080/api';
 
@@ -12,11 +11,11 @@ const apiClient = axios.create({
 
 apiClient.interceptors.response.use(
     response => {
-        console.log('API response:', response); // Log successful responses
+        console.log('API response:', response);
         return response;
     },
     error => {
-        console.error('API error:', error); // Log errors
+        console.error('API error:', error);
         if (error.response && error.response.status === 401) {
             logout();
         }
@@ -39,19 +38,22 @@ interface LoginData {
     password: string;
 }
 
-export const isAuthenticated = async (): Promise<boolean> => {
+// Check authentication and retrieve user role and details
+export const checkAuth = async (): Promise<{ isAuthenticated: boolean; role?: string; user?: User }> => {
     try {
-        if (isTokenExpired()) {
-            return false;
-        }
-        await apiClient.get('/admin/check-auth');
-        return true;
+        const response = await apiClient.get('/check-auth'); // Automatically sends cookies
+        return {
+            isAuthenticated: response.data.isAuthenticated,
+            role: response.data.role,
+            user: response.data.user // Assuming you add user details to the response
+        };
     } catch (error) {
         console.error('Authentication check failed:', error);
-        return false;
+        return { isAuthenticated: false }; // Default to not authenticated
     }
 };
 
+// Register admin user
 export const registerUser = async (userData: UserData): Promise<any> => {
     try {
         const response = await apiClient.post('/admin/register', userData);
@@ -63,6 +65,18 @@ export const registerUser = async (userData: UserData): Promise<any> => {
     }
 };
 
+export const registerNormalUser = async (userData: UserData): Promise<any> => {
+    try {
+        const response = await apiClient.post('/register', userData);
+        console.log('Register response:', response);
+        return response.data;
+    } catch (error) {
+        console.error('Register failed:', error);
+        throw error;
+    }
+};
+
+// Verify OTP
 export const verifyOtp = async (otpData: OtpData): Promise<any> => {
     try {
         const response = await apiClient.post('/admin/verify-otp', otpData);
@@ -74,6 +88,7 @@ export const verifyOtp = async (otpData: OtpData): Promise<any> => {
     }
 };
 
+// Login user
 export const loginUser = async (loginData: LoginData): Promise<any> => {
     try {
         const response = await apiClient.post('/admin/login', loginData);
@@ -85,34 +100,11 @@ export const loginUser = async (loginData: LoginData): Promise<any> => {
     }
 };
 
-export const getUserRole = async (token: string): Promise<string> => {
-    try {
-        const response = await fetchUserDetails(token);
-        console.log('Get user role response:', response);
-        return response.isAdmin ? 'ADMIN' : 'USER';
-    } catch (error) {
-        console.error('Failed to fetch user role:', error);
-        return 'USER'; // Default role
-    }
+// Get user role using checkAuth
+export const getUserRole = async (): Promise<string> => {
+    const authResponse = await checkAuth();
+    return authResponse.role || 'USER'; // Default to 'USER' if role is not found
 };
 
-export const fetchUserDetails = async (token: string): Promise<User> => {
-    if (isTokenExpired()) {
-        throw new Error('Token expired');
-    }
-
-    try {
-        const response = await apiClient.get('/user/details', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        console.log('Fetch user details response:', response);
-        return response.data;
-    } catch (error) {
-        console.error('Failed to fetch user details:', error);
-        throw error;
-    }
-};
 
 export default apiClient;
