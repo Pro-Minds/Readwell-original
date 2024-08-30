@@ -5,12 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.prominds.backendReadwell", "controller"})
+@EnableJpaRepositories(basePackages = "org.prominds.backendReadwell")
 public class BackendReadwellApplication implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(BackendReadwellApplication.class);

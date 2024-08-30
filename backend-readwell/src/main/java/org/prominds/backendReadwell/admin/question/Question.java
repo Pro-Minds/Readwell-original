@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.prominds.backendReadwell.admin.topic.Topic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,12 +20,15 @@ public class Question {
     private String questionText;
 
     @ElementCollection
-    private List<String> options;
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
+    private List<String> options = new ArrayList<>();
 
-    private String correctAnswer;
+    @ElementCollection
+    @CollectionTable(name = "correct_answers", joinColumns = @JoinColumn(name = "question_id"))
+    private List<String> correctAnswers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)
-    private Topic topic; // Associate with Topic
+    private Topic topic; // Assuming you have a Topic entity
 }
 

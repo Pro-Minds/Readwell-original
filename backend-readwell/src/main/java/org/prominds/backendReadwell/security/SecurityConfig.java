@@ -41,12 +41,12 @@ public class SecurityConfig {
                                 "/api/admin/logout",
                                 "/api/register",
                                 "/api/verify-otp",
-                                "/api/login"
+                                "/api/login",
+                                "/api/user/**",
+                                "/"
                         ).permitAll()
-                        .requestMatchers(
-                                "/api/admin/**",
-                                "/api/check-auth"
-                        ).authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only allow ADMIN role
+                        .requestMatchers("/api/check-auth").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -76,4 +76,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

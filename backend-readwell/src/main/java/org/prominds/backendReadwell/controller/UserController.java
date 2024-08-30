@@ -4,22 +4,44 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.prominds.backendReadwell.admin.Klass.Klass;
+import org.prominds.backendReadwell.admin.Klass.KlassService;
+import org.prominds.backendReadwell.admin.question.Question;
+import org.prominds.backendReadwell.admin.question.QuestionService;
+import org.prominds.backendReadwell.admin.subject.Subject;
+import org.prominds.backendReadwell.admin.subject.SubjectService;
+import org.prominds.backendReadwell.admin.topic.Topic;
+import org.prominds.backendReadwell.admin.topic.TopicService;
 import org.prominds.backendReadwell.otp.OtpVerificationDto;
 import org.prominds.backendReadwell.user.User;
 import org.prominds.backendReadwell.user.UserLoginDto;
 import org.prominds.backendReadwell.user.UserRegistrationDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
 public class UserController extends BaseUserController {
+
+    @Autowired
+    private KlassService klassService;
+
+    @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
+    private TopicService topicService;
+
+    @Autowired
+    private QuestionService questionService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto, BindingResult bindingResult) {
@@ -92,5 +114,45 @@ public class UserController extends BaseUserController {
         return null; // Token not found
     }
 
+    @GetMapping("/user/klasses")
+    public ResponseEntity<List<Klass>> getAllKlasses() {
+        return ResponseEntity.ok(klassService.getAllKlasses());
+    }
+
+    @GetMapping("/user/subjects")
+    public ResponseEntity<List<Subject>> getAllSubjects() {
+        return ResponseEntity.ok(subjectService.getAllSubjects());
+    }
+
+    @GetMapping("/user/topics")
+    public ResponseEntity<List<Topic>> getAllTopics() {
+        return ResponseEntity.ok(topicService.getAllTopics());
+    }
+
+    @GetMapping("/user/questions")
+    public ResponseEntity<List<Question>> getAllQuestions() {
+        return ResponseEntity.ok(questionService.getAllQuestions());
+    }
+
+    // Fetch subjects by class ID
+    @GetMapping("/user/subjects/{klassId}")
+    public ResponseEntity<List<Subject>> getSubjectsByKlassId(@PathVariable Long klassId) {
+        List<Subject> subjects = subjectService.getSubjectsByKlassId(klassId);
+        return ResponseEntity.ok(subjects);
+    }
+
+    // Fetch topics by subject ID
+    @GetMapping("/user/topics/{subjectId}")
+    public ResponseEntity<List<Topic>> getTopicsBySubjectId(@PathVariable Long subjectId) {
+        List<Topic> topics = topicService.getTopicsBySubjectId(subjectId);
+        return ResponseEntity.ok(topics);
+    }
+
+    // Fetch questions by topic ID
+    @GetMapping("/user/questions/{topicId}")
+    public ResponseEntity<List<Question>> getQuestionsByTopicId(@PathVariable Long topicId) {
+        List<Question> questions = questionService.getQuestionsByTopicId(topicId);
+        return ResponseEntity.ok(questions);
+    }
 
 }

@@ -13,6 +13,10 @@ public class QuestionController {
 
     @PostMapping
     public ResponseEntity<Question> createQuestion(@RequestBody Question newQuestion) {
+        // Validate input data
+        if (newQuestion.getOptions() == null || newQuestion.getCorrectAnswers() == null) {
+            throw new IllegalArgumentException("Options and correct answers must be provided");
+        }
         return ResponseEntity.ok(questionService.createQuestion(newQuestion));
     }
 

@@ -26,5 +26,9 @@ public class SubjectService {
         updatedSubject.setId(id);
         return subjectRepository.save(updatedSubject);
     }
-}
 
+    // Fetch subjects by class ID
+    public List<Subject> getSubjectsByKlassId(Long klassId) {
+        return subjectRepository.findByKlassId(klassId); // Assuming you have this method in your repository
+    }
+}
