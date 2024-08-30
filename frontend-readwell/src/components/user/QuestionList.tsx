@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getUserQuestionsByTopicId } from "../../services/userService";
 import { Question } from "../../services/types";
 import ReviewQuestions from './ReviewQuestions'; // Import the Review component
@@ -7,7 +7,6 @@ import QuizResults from "./QuizResults";
 
 const QuestionList: React.FC = () => {
     const { topicId } = useParams<{ topicId: string }>();
-    const navigate = useNavigate();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string[]>>({});
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -49,7 +48,6 @@ const QuestionList: React.FC = () => {
         setShowReview(false); // Go back to question view
     };
 
-
     const toggleFlagQuestion = (questionId: number) => {
         setFlaggedQuestions((prev) => {
             const newFlags = new Set(prev);
@@ -60,6 +58,14 @@ const QuestionList: React.FC = () => {
             }
             return newFlags;
         });
+    };
+
+    const handleNextOrSubmit = () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+            setShowReview(true); // Show review screen instead of submitting
+        }
     };
 
     return (
@@ -95,14 +101,8 @@ const QuestionList: React.FC = () => {
                                 {flaggedQuestions.has(questions[currentQuestionIndex].id) ? "Unflag" : "Flag"} as Difficult
                             </button>
                             <button onClick={() => setCurrentQuestionIndex(prev => Math.max(prev - 1, 0))} disabled={currentQuestionIndex === 0}>Prev</button>
-                            <button onClick={() => {
-                                if (currentQuestionIndex < questions.length - 1) {
-                                    setCurrentQuestionIndex(prev => prev + 1);
-                                } else {
-                                    handleFinalSubmit();
-                                }
-                            }}>
-                                {currentQuestionIndex < questions.length - 1 ? "Next" : "Submit"}
+                            <button onClick={handleNextOrSubmit}>
+                                {currentQuestionIndex < questions.length - 1 ? "Next" : "Review"}
                             </button>
                         </div>
                     ) : null}
@@ -111,6 +111,7 @@ const QuestionList: React.FC = () => {
                 <ReviewQuestions
                     questions={questions}
                     selectedAnswers={selectedAnswers}
+                    flaggedQuestions={flaggedQuestions} // Pass the flaggedQuestions prop
                     onNavigateToQuestion={navigateToQuestion}
                     onFinalSubmit={handleFinalSubmit}
                 />
