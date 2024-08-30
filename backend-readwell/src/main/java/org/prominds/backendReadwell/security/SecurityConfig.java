@@ -34,8 +34,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorization -> authorization
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("/api/admin/register", "/api/admin/verify-otp", "/api/admin/login").permitAll()
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers(
+                                "/api/admin/register",
+                                "/api/admin/verify-otp",
+                                "/api/admin/login",
+                                "/api/admin/logout",
+                                "/api/register",
+                                "/api/verify-otp",
+                                "/api/login",
+                                "/api/user/**",
+                                "/"
+                        ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only allow ADMIN role
+                        .requestMatchers("/api/check-auth").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -65,4 +76,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-

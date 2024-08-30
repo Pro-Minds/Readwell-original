@@ -3,6 +3,8 @@ package org.prominds.backendReadwell.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.prominds.backendReadwell.exceptions.TokenExpiredException;
 import org.prominds.backendReadwell.user.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,31 +26,28 @@ public class JwtUtil {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.isAdmin() ? "ADMIN" : "USER"); // Include role in claims
+        claims.put("roles", user.isAdmin() ? "ADMIN" : "USER");
         return createToken(claims, user.getEmail());
     }
-
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationTime)) // Use expiration time from application.yml
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean validateToken(String token, String email) {
         try {
-            // Check if the token is expired and validate it
             Claims claims = Jwts.parser()
                     .setSigningKey(getSignKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Optionally, check if the email in the token matches the provided email
             return claims.getSubject().equals(email);
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException("Token has expired. Please log in again.");
@@ -57,8 +56,7 @@ public class JwtUtil {
         }
     }
 
-
-    public String extractUsername(String token) {
+    public String extractUsernameFromToken(String token) {
         return extractAllClaims(token).getSubject();
     }
 
@@ -70,8 +68,12 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public Boolean isTokenExpired(String token) {
-        return extractAllClaims(token).getExpiration().before(new Date());
+    public void invalidateToken(HttpServletResponse response) {
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // Set max age to 0 to remove the cookie
+        response.addCookie(cookie);
     }
 
     private Key getSignKey() {
@@ -85,7 +87,6 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject(); // Assuming the subject is the email
+        return claims.getSubject();
     }
-
 }

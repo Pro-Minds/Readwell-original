@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { logout } from '../security/AuthService'
+import { logout } from '../security/AuthService';
+import { User } from "../services/types";
 
 const API_URL = 'http://10.49.63.86:8080/api';
 
@@ -9,8 +10,12 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.response.use(
-    response => response,
+    response => {
+        console.log('API response:', response);
+        return response;
+    },
     error => {
+        console.error('API error:', error);
         if (error.response && error.response.status === 401) {
             logout();
         }
@@ -33,33 +38,73 @@ interface LoginData {
     password: string;
 }
 
-export const isAuthenticated = async (): Promise<boolean> => {
+// Check authentication and retrieve user role and details
+export const checkAuth = async (): Promise<{ isAuthenticated: boolean; role?: string; user?: User }> => {
     try {
-        await apiClient.get('/admin/check-auth');
-        return true;
-    } catch {
-        return false;
+        const response = await apiClient.get('/check-auth'); // Automatically sends cookies
+        return {
+            isAuthenticated: response.data.isAuthenticated,
+            role: response.data.role,
+            user: response.data.user // Assuming you add user details to the response
+        };
+    } catch (error) {
+        console.error('Authentication check failed:', error);
+        return { isAuthenticated: false }; // Default to not authenticated
     }
 };
 
+// Register admin user
 export const registerUser = async (userData: UserData): Promise<any> => {
-    const response = await apiClient.post('/admin/register', userData);
-    return response.data;
+    try {
+        const response = await apiClient.post('/admin/register', userData);
+        console.log('Register response:', response);
+        return response.data;
+    } catch (error) {
+        console.error('Register failed:', error);
+        throw error;
+    }
 };
 
+export const registerNormalUser = async (userData: UserData): Promise<any> => {
+    try {
+        const response = await apiClient.post('/register', userData);
+        console.log('Register response:', response);
+        return response.data;
+    } catch (error) {
+        console.error('Register failed:', error);
+        throw error;
+    }
+};
+
+// Verify OTP
 export const verifyOtp = async (otpData: OtpData): Promise<any> => {
-    const response = await apiClient.post('/admin/verify-otp', otpData);
-    return response.data;
+    try {
+        const response = await apiClient.post('/admin/verify-otp', otpData);
+        console.log('Verify OTP response:', response);
+        return response.data;
+    } catch (error) {
+        console.error('Verify OTP failed:', error);
+        throw error;
+    }
 };
 
+// Login user
 export const loginUser = async (loginData: LoginData): Promise<any> => {
-    const response = await apiClient.post('/admin/login', loginData);
-    return response.data;
+    try {
+        const response = await apiClient.post('/admin/login', loginData);
+        console.log('Login response:', response);
+        return response.data;
+    } catch (error) {
+        console.error('Login failed:', error);
+        throw error;
+    }
 };
 
-export const fetchProtectedData = async (): Promise<any> => {
-    const response = await apiClient.get('/protected/data');
-    return response.data;
+// Get user role using checkAuth
+export const getUserRole = async (): Promise<string> => {
+    const authResponse = await checkAuth();
+    return authResponse.role || 'USER'; // Default to 'USER' if role is not found
 };
+
 
 export default apiClient;

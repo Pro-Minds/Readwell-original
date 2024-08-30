@@ -1,3 +1,5 @@
+# TODO: changes changes before production
+
 spring:
   application:
     name: backend-readwell
@@ -12,7 +14,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
   sql:
     init:

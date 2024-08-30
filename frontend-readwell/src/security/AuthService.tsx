@@ -1,25 +1,23 @@
 import { jwtDecode } from 'jwt-decode'; // Default import
 import { clearAuthToken } from './LogoutService';
+import apiClient from "../services/apiService";
 
-interface DecodedToken {
-    exp: number;
-}
-
-const getCookie = (name: string): string | undefined => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift();
-    return undefined;
-};
-
-export const isTokenExpired = (): boolean => {
-    const token = getCookie('token');
-    if (!token) return true; // No token means expired
-    const decoded = jwtDecode<DecodedToken>(token); // Use type assertion for decoded token
-    return decoded.exp * 1000 < Date.now(); // Compare expiration time in milliseconds
-};
+// interface DecodedToken {
+//     exp: number;
+// }
+//
+// export const isTokenExpired = async (): Promise<boolean> => {
+//     try {
+//         const response = await apiClient.get('/check-auth'); // No need for Authorization header
+//         return response.data; // Should return true or false based on token validity
+//     } catch (error) {
+//         console.error('Token validity check failed:', error);
+//         return false; // If there's an error, consider the token invalid
+//     }
+// };
 
 export const logout = (): void => {
     clearAuthToken(); // Clear the token cookie
     window.location.href = '/admin/login';
 };
+

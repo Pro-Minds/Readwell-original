@@ -1,163 +1,158 @@
 package org.prominds.backendReadwell.controller;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.prominds.backendReadwell.otp.GeneratedOtp;
-import org.prominds.backendReadwell.otp.GeneratedOtpRepository;
-import org.prominds.backendReadwell.otp.OtpService;
+import org.prominds.backendReadwell.admin.Klass.Klass;
+import org.prominds.backendReadwell.admin.Klass.KlassService;
+import org.prominds.backendReadwell.admin.question.Question;
+import org.prominds.backendReadwell.admin.question.QuestionService;
+import org.prominds.backendReadwell.admin.subject.Subject;
+import org.prominds.backendReadwell.admin.subject.SubjectService;
+import org.prominds.backendReadwell.admin.topic.Topic;
+import org.prominds.backendReadwell.admin.topic.TopicService;
 import org.prominds.backendReadwell.otp.OtpVerificationDto;
-import org.prominds.backendReadwell.user.*;
-import org.prominds.backendReadwell.security.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.prominds.backendReadwell.user.User;
+import org.prominds.backendReadwell.user.UserLoginDto;
+import org.prominds.backendReadwell.user.UserRegistrationDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@Validated
-public class UserController {
+@CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+public class UserController extends BaseUserController {
 
     @Autowired
-    private UserService userService;
+    private KlassService klassService;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private SubjectService subjectService;
 
     @Autowired
-    private OtpService otpService;
+    private TopicService topicService;
 
     @Autowired
-    private GeneratedOtpRepository generatedOtpRepository;
+    private QuestionService questionService;
 
-    @Autowired
-    private AuthUtil authUtil;
-
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-    @PostMapping("/admin/register")
-    public ResponseEntity<String> registerAdmin(@Valid @RequestBody UserRegistrationDto registrationDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid registration data");
-        }
-
-        // Register the user
-        User newUser = new User();
-        newUser.setEmail(registrationDto.getEmail());
-        newUser.setPassword(new BCryptPasswordEncoder().encode(registrationDto.getPassword()));
-        newUser.setAdmin(true); // Set is_admin to true
-
-        userService.saveUser(newUser);
-
-        // Generate OTP
-        String otp = otpService.generateOtp();
-
-        // Save OTP to the database
-        GeneratedOtp generatedOtp = new GeneratedOtp();
-        generatedOtp.setEmail(registrationDto.getEmail());
-        generatedOtp.setOtp(otp);
-        generatedOtpRepository.save(generatedOtp);
-
-        // Send OTP via email
-        otpService.sendOtp(registrationDto.getEmail(), otp);
-
-        // Return success message
-        return ResponseEntity.ok("User registered successfully. Please check your email for the OTP.");
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto, BindingResult bindingResult) {
+        return registerUser(registrationDto, false, bindingResult);
     }
 
-    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-    @PostMapping("/admin/verify-otp")
-    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult, HttpServletResponse response) {
+    @PostMapping("/login")
+    public ResponseEntity<String> userLogin(@RequestBody UserLoginDto loginDto, HttpServletResponse response) {
+        return super.userLogin(loginDto, response);
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyUserOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("Invalid OTP data");
         }
-
-        // Validate OTP using OtpService
-        boolean isValid = otpService.validateOtp(otpDto.getEmail(), otpDto.getOtp());
-        if (!isValid) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
-        }
-
-        // Generate a new JWT token for the user
-        User user = userService.getUserByEmail(otpDto.getEmail());
-        String token = jwtUtil.generateToken(user);
-
-        // Set token in a cookie
-        authUtil.setTokenInCookie(token, response);
-
-        return ResponseEntity.ok("Token generated and stored in cookie.");
+        return super.verifyOtp(otpDto, response);
     }
 
-    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-    @PostMapping("/admin/login")
-    public ResponseEntity<String> adminLogin(@RequestBody UserLoginDto loginDto, HttpServletResponse response) {
-        logger.info("Login attempt for email: {}", loginDto.getEmail());
+    @GetMapping("/user/details")
+    public ResponseEntity<User> getUserDetails(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String email = jwtUtil.extractUsernameFromToken(token);
+        User user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(user);
+    }
 
-        // Retrieve the user by email
-        User user = userService.getUserByEmail(loginDto.getEmail());
+    @GetMapping("/check-auth")
+    public ResponseEntity<Map<String, Object>> checkAuth(HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        String token = extractTokenFromRequest(request); // Read the token from the cookie
+
+        if (token == null) {
+            response.put("isAuthenticated", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // Extract email from the token
+        String email = jwtUtil.extractUsernameFromToken(token);
+
+        // Validate the token with the extracted email
+        if (!jwtUtil.validateToken(token, email)) {
+            response.put("isAuthenticated", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        User user = userService.getUserByEmail(email);
+
         if (user == null) {
-            logger.warn("User not found for email: {}", loginDto.getEmail());
-            throw new UsernameNotFoundException("User not found with email: " + loginDto.getEmail());
+            response.put("isAuthenticated", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        logger.info("User found: {}", user.getEmail());
+        response.put("isAuthenticated", true);
+        response.put("role", user.isAdmin() ? "ADMIN" : "USER");
+        response.put("user", user); // Add user details to the response
+        return ResponseEntity.ok(response);
+    }
 
-        // Check if password matches
-        boolean passwordMatches = userService.matchesPassword(loginDto.getPassword(), user.getPassword());
-        if (!passwordMatches) {
-            logger.warn("Invalid password for email: {}", loginDto.getEmail());
-            throw new BadCredentialsException("Invalid password");
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("token".equals(cookie.getName())) { // Use the actual cookie name here
+                    return cookie.getValue();
+                }
+            }
         }
-
-        // Generate a new JWT token for the user
-        String token = jwtUtil.generateToken(user);
-
-        // Set token in a cookie
-        authUtil.setTokenInCookie(token, response);
-
-        return ResponseEntity.ok("Token generated and stored in cookie.");
+        return null; // Token not found
     }
 
-    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-    @GetMapping("/admin/check-auth")
-    public ResponseEntity<String> checkAuth() {
-        return ResponseEntity.ok("User is authenticated");
+    @GetMapping("/user/klasses")
+    public ResponseEntity<List<Klass>> getAllKlasses() {
+        return ResponseEntity.ok(klassService.getAllKlasses());
     }
 
-    @CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
-    @PostMapping("/admin/logout")
-    public ResponseEntity<String> logout(HttpServletResponse response) {
-        // Invalidate the JWT token by setting its cookie to expire immediately
-        Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // This will remove the cookie
-
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok("Successfully logged out.");
+    @GetMapping("/user/subjects")
+    public ResponseEntity<List<Subject>> getAllSubjects() {
+        return ResponseEntity.ok(subjectService.getAllSubjects());
     }
 
+    @GetMapping("/user/topics")
+    public ResponseEntity<List<Topic>> getAllTopics() {
+        return ResponseEntity.ok(topicService.getAllTopics());
+    }
 
+    @GetMapping("/user/questions")
+    public ResponseEntity<List<Question>> getAllQuestions() {
+        return ResponseEntity.ok(questionService.getAllQuestions());
+    }
 
-//    @PostMapping("/admin/refresh-token")
-//    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
-//        if (jwtUtil.isTokenExpired(token)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-//        }
-//        // Generate a new token
-//        String email = jwtUtil.extractUsername(token);
-//        User user = userService.getUserByEmail(email);
-//        String newToken = jwtUtil.generateToken(user);
-//        return ResponseEntity.ok(newToken);
-//    }
+    // Fetch subjects by class ID
+    @GetMapping("/user/subjects/{klassId}")
+    public ResponseEntity<List<Subject>> getSubjectsByKlassId(@PathVariable Long klassId) {
+        List<Subject> subjects = subjectService.getSubjectsByKlassId(klassId);
+        return ResponseEntity.ok(subjects);
+    }
+
+    // Fetch topics by subject ID
+    @GetMapping("/user/topics/{subjectId}")
+    public ResponseEntity<List<Topic>> getTopicsBySubjectId(@PathVariable Long subjectId) {
+        List<Topic> topics = topicService.getTopicsBySubjectId(subjectId);
+        return ResponseEntity.ok(topics);
+    }
+
+    // Fetch questions by topic ID
+    @GetMapping("/user/questions/{topicId}")
+    public ResponseEntity<List<Question>> getQuestionsByTopicId(@PathVariable Long topicId) {
+        List<Question> questions = questionService.getQuestionsByTopicId(topicId);
+        return ResponseEntity.ok(questions);
+    }
+
 }

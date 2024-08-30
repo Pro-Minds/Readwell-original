@@ -8,10 +8,10 @@ const QuestionManager = () => {
     const [newQuestion, setNewQuestion] = useState({
         questionText: '',
         options: [''],
-        correctAnswer: '',
+        correctAnswers: [''],  // Changed from correctAnswer to correctAnswers
         topic: { id: 0 }
     });
-    const [editingQuestion, setEditingQuestion] = useState<{ id?: number; questionText?: string; options?: string[]; correctAnswer?: string; topic?: number }>({});
+    const [editingQuestion, setEditingQuestion] = useState<{ id?: number; questionText?: string; options?: string[]; correctAnswers?: string[]; topic?: number }>({});
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -48,7 +48,7 @@ const QuestionManager = () => {
             setNewQuestion({
                 questionText: '',
                 options: [''],
-                correctAnswer: '',
+                correctAnswers: [''],  // Reset correctAnswers
                 topic: { id: 0 }
             });
         } catch (error) {
@@ -62,7 +62,7 @@ const QuestionManager = () => {
             const data = await updateQuestion(editingQuestion.id, {
                 questionText: editingQuestion.questionText,
                 options: editingQuestion.options || [],
-                correctAnswer: editingQuestion.correctAnswer,
+                correctAnswers: editingQuestion.correctAnswers || [],  // Ensure correctAnswers is sent
                 topic: { id: editingQuestion.topic || 0 }
             });
             setQuestions(questions.map(question => question.id === data.id ? data : question));
@@ -99,9 +99,9 @@ const QuestionManager = () => {
             />
             <input
                 type="text"
-                value={newQuestion.correctAnswer}
-                onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })}
-                placeholder="Correct Answer"
+                value={newQuestion.correctAnswers.join(',')}  // Update for correctAnswers
+                onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswers: e.target.value.split(',') })}  // Update for correctAnswers
+                placeholder="Correct Answers (comma separated)"
             />
             <select
                 onChange={(e) => setNewQuestion({ ...newQuestion, topic: { id: parseInt(e.target.value) } })}
@@ -131,9 +131,9 @@ const QuestionManager = () => {
                     />
                     <input
                         type="text"
-                        value={editingQuestion.correctAnswer || ''}
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, correctAnswer: e.target.value })}
-                        placeholder="Update Correct Answer"
+                        value={editingQuestion.correctAnswers?.join(',') || ''}  // Update for correctAnswers
+                        onChange={(e) => setEditingQuestion({ ...editingQuestion, correctAnswers: e.target.value.split(',') })}  // Update for correctAnswers
+                        placeholder="Update Correct Answers (comma separated)"
                     />
                     <select
                         onChange={(e) => setEditingQuestion({ ...editingQuestion, topic: parseInt(e.target.value) })}
@@ -157,7 +157,7 @@ const QuestionManager = () => {
                             id: question.id,
                             questionText: question.questionText,
                             options: question.options,
-                            correctAnswer: question.correctAnswer,
+                            correctAnswers: question.correctAnswers,  // Update for correctAnswers
                             topic: question.topic.id
                         })}>Edit</button>
                         <button onClick={() => handleDelete(question.id)}>Delete</button>

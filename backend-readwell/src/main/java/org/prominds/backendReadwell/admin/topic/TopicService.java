@@ -26,5 +26,9 @@ public class TopicService {
         updatedTopic.setId(id);
         return topicRepository.save(updatedTopic);
     }
+
+    public List<Topic> getTopicsBySubjectId(Long subjectId) {
+        return topicRepository.findBySubjectId(subjectId);
+    }
 }
 

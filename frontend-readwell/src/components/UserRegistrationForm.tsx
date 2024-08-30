@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserRole, loginUser } from '../services/apiService';
+import { registerNormalUser} from "../services/apiService";
 
-const LoginForm: React.FC = () => {
+const UserRegistrationForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -10,15 +10,10 @@ const LoginForm: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
-            await loginUser({ email, password });
-            const role = await getUserRole(); // Get the user role after login
-            if (role === 'ADMIN') {
-                navigate('/admin/panel');
-            } else {
-                navigate('/'); // Redirect to user dashboard or home
-            }
+            await registerNormalUser({ email, password }); // Call the normal user registration function
+            navigate(`/verify-otp?email=${email}`); // Redirect to OTP verification page
         } catch (error) {
-            console.error('Login failed:', error);
+            console.error('Registration failed:', error);
         }
     };
 
@@ -38,9 +33,9 @@ const LoginForm: React.FC = () => {
                 required
                 placeholder="Password"
             />
-            <button type="submit">Login</button>
+            <button type="submit">Register</button>
         </form>
     );
 };
 
-export default LoginForm;
+export default UserRegistrationForm;
