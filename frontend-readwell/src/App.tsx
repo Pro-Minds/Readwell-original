@@ -10,41 +10,53 @@ import QuestionManager from './components/admin/QuestionManager';
 import OTPVerification from './components/OTPVerification';
 import ProtectedRoute from './security/ProtectedRoute';
 import HomePage from "./components/user/HomePage";
-import UserRegistrationForm from "./components/user/UserRegistrationForm";
+import UserRegistrationForm from "./components/UserRegistrationForm";
+import SubjectList from "./components/user/SubjectList";
+import TopicList from "./components/user/TopicList";
+import QuestionList from "./components/user/QuestionList";
 
 const App = () => {
     return (
         <Router>
             <Routes>
+                {/* User Authentication Routes */}
                 <Route path="/admin/register" element={<RegistrationForm />} />
                 <Route path="/register" element={<UserRegistrationForm />} />
                 <Route path="/admin/login" element={<LoginForm />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/admin/verify-otp" element={<OTPVerification />} />
                 <Route path="/verify-otp" element={<OTPVerification />} />
+
+                {/* User Routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/subjects/:klassId" element={<SubjectList />} />
+                <Route path="/topics/:subjectId" element={<TopicList />} />
+                <Route path="/questions/:topicId" element={<QuestionList />} />
+
+                {/* Admin Protected Routes */}
                 <Route
                     path="/admin/panel"
-                    element={<ProtectedRoute component={AdminPanel} allowedRoles={['ADMIN']} />} 
+                    element={<ProtectedRoute component={AdminPanel} allowedRoles={['ADMIN']} />}
                 />
                 <Route
                     path="/admin/manage-klasses"
-                    element={<ProtectedRoute component={KlassManager} allowedRoles={['ADMIN']} />} 
+                    element={<ProtectedRoute component={KlassManager} allowedRoles={['ADMIN']} />}
                 />
                 <Route
                     path="/admin/manage-subjects"
-                    element={<ProtectedRoute component={SubjectManager} allowedRoles={['ADMIN']} />} 
+                    element={<ProtectedRoute component={SubjectManager} allowedRoles={['ADMIN']} />}
                 />
                 <Route
                     path="/admin/manage-topics"
-                    element={<ProtectedRoute component={TopicManager} allowedRoles={['ADMIN']} />} 
+                    element={<ProtectedRoute component={TopicManager} allowedRoles={['ADMIN']} />}
                 />
                 <Route
                     path="/admin/manage-questions"
-                    element={<ProtectedRoute component={QuestionManager} allowedRoles={['ADMIN']} />} 
+                    element={<ProtectedRoute component={QuestionManager} allowedRoles={['ADMIN']} />}
                 />
 
-                <Route path="/" element={<HomePage />} />  {/* Ensure you have a home page */}
-                <Route path="*" element={<Navigate to="/admin/login" replace />} />
+                {/* Redirect any unmatched routes */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
     );
