@@ -8,7 +8,7 @@ spring:
         secret-key: xPaGg4XP2BF7t88wPCRwS78m36KQ06gf0TTjkAam/Viuvq1L2nagwW3HS36r0m/Sfjz/7ZXQjhEv9D24uVtZ2w==
         expiration: 3600000 # 1 hour in milliseconds
   datasource:
-    url: jdbc:postgresql://localhost:5432/readwell-db
+    url: jdbc:postgresql://postgres:5432/readwell-db
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
