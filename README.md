@@ -46,7 +46,7 @@ cd frontend-readwell
 npm install
 ```
 ```shell
-ng serve
+npm start
 ```
 - navigate to [http://localhost:4200](http://localhost:4200)
   if you see:
@@ -54,4 +54,4 @@ ng serve
 Data from Spring Boot:
 Hello from the database!
 ```
-- it means the react module is connected to spring-boot module.
+- it means the React module is connected to spring-boot module.
