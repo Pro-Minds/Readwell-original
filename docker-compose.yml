@@ -1,12 +1,45 @@
 version: '3.8'
 
 services:
+  postgres:
+    build:
+      context: ./backend-readwell
+      dockerfile: Dockerfile.postgres
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - readwell-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mail-dev:
+    build:
+      context: ./backend-readwell
+      dockerfile: Dockerfile.maildev
+    container_name: readwell-mail-dev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - readwell-net
+
   backend:
     build:
       context: ./backend-readwell
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    networks:
+      - readwell-net
+    depends_on:
+      postgres:
+        condition: service_healthy  # Wait for PostgreSQL to be healthy
 
   frontend:
     build:
@@ -14,3 +47,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    networks:
+      - readwell-net
+
+volumes:
+  postgres_data:
+
+networks:
+  readwell-net:
+    driver: bridge

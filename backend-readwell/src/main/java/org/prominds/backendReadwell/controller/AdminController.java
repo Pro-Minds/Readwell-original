@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://10.49.63.86:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://10.49.63.86:80", allowCredentials = "true")
 public class AdminController extends BaseUserController {
 
     @PostMapping("/register")
