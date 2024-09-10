@@ -24,7 +24,7 @@ spring:
       password: test
       name: test
   mail:
-    host: localhost
+    host: readwell-mail-dev
     port: 1025
     username: ulga
     password: ulga
@@ -43,3 +43,9 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.mail: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

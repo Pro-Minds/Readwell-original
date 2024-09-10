@@ -28,7 +28,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://10.49.63.86:80", allowCredentials = "true")
+@CrossOrigin(origins = "http://readwell-UI:3000", allowCredentials = "true")
 public class UserController extends BaseUserController {
 
     @Autowired
@@ -45,16 +45,19 @@ public class UserController extends BaseUserController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto, BindingResult bindingResult) {
+        logger.info("Received registration request for user: {}", registrationDto.getEmail());
         return registerUser(registrationDto, false, bindingResult);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> userLogin(@RequestBody UserLoginDto loginDto, HttpServletResponse response) {
+        logger.info("Received login request for user: {}", loginDto.getEmail());
         return super.userLogin(loginDto, response);
     }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<String> verifyUserOtp(@Valid @RequestBody OtpVerificationDto otpDto, BindingResult bindingResult, HttpServletResponse response) {
+        logger.info("Received OTP verification request for user: {}", otpDto.getEmail());
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("Invalid OTP data");
         }
@@ -65,6 +68,7 @@ public class UserController extends BaseUserController {
     public ResponseEntity<User> getUserDetails(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String email = jwtUtil.extractUsernameFromToken(token);
+        logger.info("Received request for user details for: {}", email);
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }

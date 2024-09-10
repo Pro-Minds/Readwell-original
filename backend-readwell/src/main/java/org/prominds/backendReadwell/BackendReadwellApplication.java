@@ -26,6 +26,7 @@ public class BackendReadwellApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		logger.info("Backend service started.");
 		try {
 			jdbcTemplate.execute("SELECT 1"); // Simple query to check DB connection
 			logger.info("Successfully connected to the database.");

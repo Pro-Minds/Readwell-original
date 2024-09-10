@@ -30,6 +30,7 @@ services:
       - readwell-net
 
   backend:
+    container_name: readwell-server
     build:
       context: ./backend-readwell
       dockerfile: Dockerfile
@@ -37,16 +38,14 @@ services:
       - "8080:8080"
     networks:
       - readwell-net
-    depends_on:
-      postgres:
-        condition: service_healthy  # Wait for PostgreSQL to be healthy
 
   frontend:
+    container_name: readwell-UI
     build:
       context: ./frontend-readwell
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "3000:3000"
     networks:
       - readwell-net
 
