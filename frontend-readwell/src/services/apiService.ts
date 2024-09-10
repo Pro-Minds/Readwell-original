@@ -2,7 +2,7 @@ import axios from 'axios';
 import { logout } from '../security/AuthService';
 import { User } from "../services/types";
 
-const API_URL = 'http://10.49.63.86:8080/api';
+const API_URL = 'http:10.49.63.86:8080/api';  // Update to match backend service name and port
 
 const apiClient = axios.create({
     baseURL: API_URL,
