@@ -29,16 +29,17 @@ public class QuestionService {
 
         // Create and save answers based on options
         for (String option : newQuestion.getOptions()) {
-            Answer answer = new Answer();
-            answer.setQuestion(savedQuestion);
-            answer.setSelectedOption(option);
-            answer.setCorrect(newQuestion.getCorrectAnswers().contains(option)); // Use setCorrect instead
-            answerRepository.save(answer);
+            if (option != null && !option.trim().isEmpty()) {
+                Answer answer = new Answer();
+                answer.setQuestion(savedQuestion);
+                answer.setSelectedOption(option);
+                answer.setCorrect(newQuestion.getCorrectAnswers().contains(option));
+                answerRepository.save(answer);
+            }
         }
 
         return savedQuestion; // Return the saved question
     }
-
 
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();

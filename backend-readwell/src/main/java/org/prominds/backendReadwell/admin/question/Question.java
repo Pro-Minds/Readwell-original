@@ -21,14 +21,16 @@ public class Question {
 
     @ElementCollection
     @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
-    private List<String> options = new ArrayList<>();
+    @Column(name = "option_value")
+    private List<String> options = new ArrayList<>();    
 
     @ElementCollection
     @CollectionTable(name = "correct_answers", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "answer_value")
     private List<String> correctAnswers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)
-    private Topic topic; // Assuming you have a Topic entity
+    private Topic topic; 
 }
 
