@@ -1,3 +1,4 @@
+# Dockerfile
 FROM node:20 as build
 LABEL authors="sinke"
 
@@ -30,6 +31,10 @@ COPY --from=build /app/build /app/build
 
 # Expose the port on which the app will run
 EXPOSE 3000
+
+# Set environment variables
+ENV REACT_APP_API_URL=http://localhost:8080/api
+ENV REACT_APP_USER_API_URL=http://localhost:8080/api/user
 
 # Serve the app
 CMD ["serve", "-s", "build", "-l", "3000"]

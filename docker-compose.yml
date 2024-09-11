@@ -46,6 +46,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://readwell-server:8080/api
+      - REACT_APP_USER_API_URL=http://readwell-server:8080/api/user
     networks:
       - readwell-net
 
