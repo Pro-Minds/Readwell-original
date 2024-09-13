@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend-readwell
       dockerfile: Dockerfile.postgres
-    container_name: postgres_db
+    container_name: postgres_db-readwell_APP
     ports:
       - "5432:5432"
     volumes:
@@ -28,7 +28,7 @@ services:
     build:
       context: ./backend-readwell
       dockerfile: Dockerfile.maildev
-    container_name: readwell-mail-dev
+    container_name: readwell-mail_APP
     ports:
       - "1080:1080"
       - "1025:1025"
@@ -36,7 +36,7 @@ services:
       - readwell-net
 
   backend:
-    container_name: readwell-server
+    container_name: readwell-APP-server
     build:
       context: ./backend-readwell
       dockerfile: Dockerfile
@@ -51,7 +51,7 @@ services:
         condition: service_healthy  # Ensure backend waits for postgres to be healthy
 
   frontend:
-    container_name: readwell-UI
+    container_name: readwell-UI_APP
     build:
       context: ./frontend-readwell
       dockerfile: Dockerfile

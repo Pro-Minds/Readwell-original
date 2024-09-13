@@ -1,5 +1,6 @@
 package org.prominds.backendReadwell;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -21,6 +22,13 @@ public class BackendReadwellApplication implements CommandLineRunner {
 	private JdbcTemplate jdbcTemplate;
 
 	public static void main(String[] args) {
+		Dotenv dotenv = Dotenv.load(); // Load .env file
+
+		// Set system properties from .env
+		dotenv.entries().forEach(entry -> {
+			System.setProperty(entry.getKey(), entry.getValue());
+		});
+
 		SpringApplication.run(BackendReadwellApplication.class, args);
 	}
 
@@ -33,5 +41,17 @@ public class BackendReadwellApplication implements CommandLineRunner {
 		} catch (Exception e) {
 			logger.error("Failed to connect to the database: {}", e.getMessage());
 		}
+
+		// Log environment variables
+		logger.info("POSTGRES_DB: {}", System.getProperty("POSTGRES_DB"));
+		logger.info("POSTGRES_USER: {}", System.getProperty("POSTGRES_USER"));
+		logger.info("POSTGRES_PASSWORD: {}", System.getProperty("POSTGRES_PASSWORD"));
+		logger.info("SPRING_SECURITY_JWT_SECRET_KEY: {}", System.getProperty("SPRING_SECURITY_JWT_SECRET_KEY"));
+		logger.info("SPRING_SECURITY_JWT_EXPIRATION: {}", System.getProperty("SPRING_SECURITY_JWT_EXPIRATION"));
+		logger.info("SPRING_MAIL_HOST: {}", System.getProperty("SPRING_MAIL_HOST"));
+		logger.info("SPRING_MAIL_PORT: {}", System.getProperty("SPRING_MAIL_PORT"));
+		logger.info("SPRING_MAIL_USERNAME: {}", System.getProperty("SPRING_MAIL_USERNAME"));
+		logger.info("SPRING_MAIL_PASSWORD: {}", System.getProperty("SPRING_MAIL_PASSWORD"));
 	}
+
 }
