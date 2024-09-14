@@ -1,0 +1,5 @@
+# Dockerfile.maildev
+FROM maildev/maildev
+
+# Expose the ports
+EXPOSE 1080 1025
