@@ -10,6 +10,12 @@ if [ -z "$TAG" ]; then
   exit 1
 fi
 
+# Ensure we are on the main branch
+git checkout main
+
+# Fetch the latest changes
+git pull original main
+
 # Check if the tag already exists
 if git rev-parse "$TAG" >/dev/null 2>&1; then
   echo "Error: Tag '$TAG' already exists."
@@ -18,12 +24,14 @@ fi
 
 # Create a new tag
 git tag "$TAG"
-git push origin "$TAG"
+
+# Push the tag to the remote repository
+git push original "$TAG"
 
 echo "Tag '$TAG' created and pushed."
 
-# Optionally, you can trigger the GitHub Actions workflow if needed
+# Optionally, trigger the GitHub Actions workflow if needed
 # For this, you'll need to use GitHub's REST API or the GitHub CLI to trigger the workflow
 
-# Example with GitHub CLI
+# Example with GitHub CLI (Uncomment if needed)
 #gh workflow run deploy.yml -f TAG=$TAG
