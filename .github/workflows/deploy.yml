@@ -24,18 +24,18 @@ jobs:
       - name: Get the most recent tag
         id: get_tag
         run: |
-          TAG=$(git tag --sort=-creatordate | head -n 1 || echo "v0")
+          TAG=$(git tag --sort=-creatordate | head -n 1 || echo "v0.0.1")
           echo "Latest Tag: $TAG"
           echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Build and push backend image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.TAG }} ./backend
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.TAG }} ./backend-readwell
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.TAG }}
 
       - name: Build and push frontend image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.TAG }} ./frontend
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.TAG }} ./frontend-readwell
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.TAG }}
 
       - name: Tag and push commit
