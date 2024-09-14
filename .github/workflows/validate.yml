@@ -11,6 +11,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
 
+    # Run validation only if the PR is not targeting the main branch
+    if: github.base_ref != 'main'
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3

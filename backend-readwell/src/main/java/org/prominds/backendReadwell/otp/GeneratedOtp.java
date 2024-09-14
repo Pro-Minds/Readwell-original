@@ -8,22 +8,18 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "generated_otp")
 public class GeneratedOtp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    @Setter
     private Long id;
 
-    @Getter
-    @Setter
     private String email;
 
-    @Getter
-    @Setter
     private String otp;
 }
 

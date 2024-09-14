@@ -1,0 +1,8 @@
+# Dockerfile.postgres
+FROM postgres:latest
+
+# Expose the port
+EXPOSE 5432
+
+# Add healthcheck
+HEALTHCHECK CMD pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}

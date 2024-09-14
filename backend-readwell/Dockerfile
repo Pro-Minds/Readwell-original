@@ -1,4 +1,4 @@
-FROM openjdk:17-jre-slim
+FROM openjdk:17-slim
 LABEL authors="sinke"
 
 # Set the working directory
@@ -9,14 +9,16 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Copy the wait-for-it script
+COPY ./scripts/wait-for-it.sh /usr/local/bin/wait-for-it
+RUN chmod +x /usr/local/bin/wait-for-it
+
 # Copy the source code
 COPY src ./src
 
 # Build the application
+RUN ./mvnw clean install -DskipTests
 RUN ./mvnw package -DskipTests
 
-# Expose the port your app runs on
-EXPOSE 8080
-
-# Run the application
-CMD ["java", "-jar", "target/your-backend-application.jar"]
+# Specify the command to run your application
+CMD ["wait-for-it", "postgres:5432", "--", "java", "-jar", "target/backend-readwell-0.0.1-SNAPSHOT.jar"]

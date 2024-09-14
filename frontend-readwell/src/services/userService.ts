@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://10.49.63.86:8080/api/user';
+const USER_API_URL = process.env.REACT_APP_USER_API_URL || 'http://10.49.63.86:8080/api/user';
 
 const userApiClient = axios.create({
-    baseURL: API_URL,
+    baseURL: USER_API_URL,
     withCredentials: true,
 });
 
