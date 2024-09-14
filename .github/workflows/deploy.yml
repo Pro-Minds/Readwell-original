@@ -24,21 +24,42 @@ jobs:
       - name: Get the most recent tag
         id: get_tag
         run: |
-          TAG=$(git tag --sort=-creatordate | head -n 1 || echo "v0.0.1")
-          echo "Latest Tag: $TAG"
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          TAG=$(git tag --sort=-creatordate | head -n 1)
+          if [ -z "$TAG" ]; then
+            echo "NO tag on the repo, please create a tag"
+            exit 1
+          else
+            echo "Latest Tag: $TAG"
+            echo "TAG=$TAG" >> $GITHUB_ENV
+          fi
+
+      - name: Debug Tag
+        run: |
+          echo "Current TAG is: ${{ env.TAG }}"
 
       - name: Build and push backend image
         run: |
+          if [ -z "${{ env.TAG }}" ]; then
+            echo "TAG is empty. Exiting..."
+            exit 1
+          fi
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.TAG }} ./backend-readwell
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.TAG }}
 
       - name: Build and push frontend image
         run: |
+          if [ -z "${{ env.TAG }}" ]; then
+            echo "TAG is empty. Exiting..."
+            exit 1
+          fi
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.TAG }} ./frontend-readwell
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.TAG }}
 
       - name: Tag and push commit
         run: |
+          if [ -z "${{ env.TAG }}" ]; then
+            echo "TAG is empty. Exiting..."
+            exit 1
+          fi
           git tag ${{ env.TAG }}
           git push origin ${{ env.TAG }}
