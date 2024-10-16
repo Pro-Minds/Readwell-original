@@ -39,6 +39,9 @@ spring:
         timeout: 3000
         writetimeout: 5000
 
+cors:
+  allowed-origins: "${ALLOWED_ORIGINS:http://localhost:3000,http://readwell-UI:3000}"
+
 logging:
   level:
     org.springframework.security: DEBUG

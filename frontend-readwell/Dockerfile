@@ -14,8 +14,13 @@ RUN npm install
 # Copy the rest of your application
 COPY . .
 
-# Build the application
-RUN npm run build
+# Set build arguments for environment variables
+ARG REACT_APP_API_URL
+ARG REACT_APP_USER_API_URL
+
+# Build the application with environment variables
+RUN REACT_APP_API_URL=$REACT_APP_API_URL REACT_APP_USER_API_URL=$REACT_APP_USER_API_URL npm run build
+
 
 # Production Stage
 FROM node:20
