@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
-    "@types/jwt-decode": "^2.2.1"
+    "@types/jwt-decode": "^2.2.1",
+    "browser-sync": "^3.0.3"
   }
 }

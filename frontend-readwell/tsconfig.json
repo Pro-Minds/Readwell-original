@@ -16,6 +16,9 @@
       "@/*": ["*"]                 // Simplifies import paths
     }
   },
-  "include": ["src"],                // Specifies the directory to include in the compilation
+  "include": [
+    "src",
+    "src/services/cssModules.d.ts"
+  ],                // Specifies the directory to include in the compilation
   "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"] // Excludes test files and node_modules
 }
