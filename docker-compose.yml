@@ -16,8 +16,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - readwell-net
-    env_file:
-      - ./backend-readwell/src/main/resources/.env
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
@@ -38,28 +36,38 @@ services:
   backend:
     container_name: readwell-server
     build:
-      context: ./backend-readwell
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.backend-readwell
     ports:
       - "8080:8080"
     networks:
       - readwell-net
-    env_file:
-      - ./backend-readwell/src/main/resources/.env
+    environment:
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      SPRING_SECURITY_JWT_SECRET_KEY: ${SPRING_SECURITY_JWT_SECRET_KEY}
+      SPRING_SECURITY_JWT_EXPIRATION: ${SPRING_SECURITY_JWT_EXPIRATION}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy  # Ensure backend waits for postgres to be healthy
+
 
   frontend:
     container_name: readwell-UI
     build:
       context: ./frontend-readwell
       dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
+        REACT_APP_USER_API_URL: ${REACT_APP_USER_API_URL}
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=${REACT_APP_API_URL}
-      - REACT_APP_USER_API_URL=${REACT_APP_USER_API_URL}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      REACT_APP_USER_API_URL: ${REACT_APP_USER_API_URL}
     networks:
       - readwell-net
 
@@ -69,3 +77,4 @@ volumes:
 networks:
   readwell-net:
     driver: bridge
+    name: readwell-net
