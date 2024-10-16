@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserRole, loginUser } from '../services/apiService';
+import styles from './RegistrationForm.module.css';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -23,8 +24,10 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className={styles.regForm} onSubmit={handleSubmit}>
+            <h1 className={styles.head}> Readwell - Admin Login</h1>
             <input
+                className={styles.input}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -32,13 +35,14 @@ const LoginForm: React.FC = () => {
                 placeholder="Email"
             />
             <input
+                className={styles.input}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Password"
             />
-            <button type="submit">Login</button>
+            <button className={styles.btn} type="submit">Login</button>
         </form>
     );
 };
