@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {logout} from "../security/AuthService";
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://10.49.63.86:8080/api'
+const API_URL = process.env.REACT_APP_API_URL;
 
 const adminApiClient = axios.create({
     baseURL: API_URL,
