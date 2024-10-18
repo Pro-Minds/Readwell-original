@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { createSubject, getSubjects, updateSubject, deleteSubject } from '../../services/adminService';
 import { getKlasses } from '../../services/adminService';
+import styles from '../AdminStyles.module.css'
 
 const SubjectManager = () => {
     const [subjects, setSubjects] = useState<any[]>([]);
     const [klasses, setKlasses] = useState<any[]>([]);
     const [newSubject, setNewSubject] = useState({ name: '', klass: { id: 0 } });
     const [editingSubject, setEditingSubject] = useState<{ id?: number; name?: string; klass?: number }>({});
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchSubjects = async () => {
@@ -70,25 +73,31 @@ const SubjectManager = () => {
     };
 
     return (
-        <div>
-            <h2>Manage Subjects</h2>
+        <div className={styles.compHome}>
+            <div className={styles.headBtn}>
+                <h2>Manage Subjects</h2>
+                {/* Button to navigate to admin page page */}
+                <button onClick={() => navigate('/admin/panel')}>Go to Home</button>
+            </div>
             {/* Form for creating subject */}
-            <input
-                type="text"
-                value={newSubject.name}
-                onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
-                placeholder="Subject Name"
-            />
-            <select
-                onChange={(e) => setNewSubject({ ...newSubject, klass: { id: parseInt(e.target.value) } })}
-                value={newSubject.klass.id}
-            >
-                <option value={0}>Select Class</option>
-                {klasses.map(klass => (
-                    <option key={klass.id} value={klass.id}>{klass.name}</option>
-                ))}
-            </select>
-            <button onClick={handleCreate}>Create Subject</button>
+            <div className={styles.inputBtn}>
+                <input
+                    type="text"
+                    value={newSubject.name}
+                    onChange={(e) => setNewSubject({...newSubject, name: e.target.value})}
+                    placeholder="Subject Name"
+                />
+                <select
+                    onChange={(e) => setNewSubject({...newSubject, klass: {id: parseInt(e.target.value)}})}
+                    value={newSubject.klass.id}
+                >
+                    <option value={0}>Select Class</option>
+                    {klasses.map(klass => (
+                        <option key={klass.id} value={klass.id}>{klass.name}</option>
+                    ))}
+                </select>
+                <button onClick={handleCreate}>Create Subject</button>
+            </div>
 
             {/* Form for updating subject */}
             {editingSubject.id && (
@@ -96,11 +105,11 @@ const SubjectManager = () => {
                     <input
                         type="text"
                         value={editingSubject.name || ''}
-                        onChange={(e) => setEditingSubject({ ...editingSubject, name: e.target.value })}
+                        onChange={(e) => setEditingSubject({...editingSubject, name: e.target.value})}
                         placeholder="Update Subject Name"
                     />
                     <select
-                        onChange={(e) => setEditingSubject({ ...editingSubject, klass: parseInt(e.target.value) })}
+                        onChange={(e) => setEditingSubject({...editingSubject, klass: parseInt(e.target.value)})}
                         value={editingSubject.klass}
                     >
                         <option value={0}>Select Class</option>
@@ -112,16 +121,25 @@ const SubjectManager = () => {
                 </div>
             )}
 
-            <h3>Existing Subjects:</h3>
-            <ul>
-                {subjects.map((subject) => (
-                    <li key={subject.id}>
-                        {subject.name}
-                        <button onClick={() => setEditingSubject({ id: subject.id, name: subject.name, klass: subject.klass.id })}>Edit</button>
-                        <button onClick={() => handleDelete(subject.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <div className={styles.classes}>
+                <h3>Existing Subjects:</h3>
+                <div className={styles.lst}>
+                    {subjects.map((subject) => (
+                        <div className={styles.list} key={subject.id}>
+                            <div className={styles.clName}>{subject.name}</div>
+                            <div className={styles.clBtn}>
+                                <button onClick={() => setEditingSubject({
+                                    id: subject.id,
+                                    name: subject.name,
+                                    klass: subject.klass.id
+                                })}>Edit
+                                </button>
+                                <button onClick={() => handleDelete(subject.id)}>Delete</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

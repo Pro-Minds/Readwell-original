@@ -70,7 +70,7 @@
 .inputBtn {
     margin-top: 50px;
 }
-.inputBtn input, .inputBtn button {
+.inputBtn input, .inputBtn button, .inputBtn select {
     padding: 10px 20px;
     border-radius: 5px;
 }
