@@ -1,10 +1,26 @@
+.home, .compHome{
+    display: flex;
+    padding: 50px;
+    justify-content: space-between;
+    flex-direction: row;
+}
+.compHome{
+    flex-direction: column;
+}
+.logout {
+    width: 20px;
+    height: 15px;
+    background: #6900ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .adminUI{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 50px;
-    width: 100%;
+    width: 78%;
     height: 100%;
 }
 .head {
@@ -12,7 +28,9 @@
 }
 .link{
     cursor: pointer;
-    outline-color: transparent;
+    outline: none;
+    color: black;
+    text-decoration: none;
 }
 .link:link {
     color: #6900ff;
@@ -35,4 +53,55 @@
 .link:active {
     background: #6900ff;
     color: #cdfeaa;
+}
+.btn, .headBtn button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: red;
+    cursor: pointer;
+    border-radius: 10px;
+    color: aliceblue;
+    border: none;
+}
+.inputBtn, .headBtn {
+    display: flex;
+    align-items: center;
+}
+.inputBtn {
+    margin-top: 50px;
+}
+.inputBtn input, .inputBtn button {
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+.headBtn h2 {
+    margin-right: 25px;
+}
+.headBtn button {
+    background: blue;
+    height: 50px;
+}
+.classes{
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+}
+
+.classes h3{
+    margin-top: 50px;
+    font-size: 18px;
+}
+.lst{
+    width: 100%;
+}
+
+.list {
+    display: flex;
+    padding: 5px 0;
+}
+.clName{
+    width: 20%;
+}
+.clBtn{
+    width: 80%;
 }
