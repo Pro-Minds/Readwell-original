@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { createKlass, getKlasses, updateKlass, deleteKlass } from '../../services/adminService';
+import styles from '../AdminStyles.module.css'
 
 const KlassManager = () => {
     const [klasses, setKlasses] = useState<any[]>([]);
     const [newKlass, setNewKlass] = useState({ name: '' });
     const [editingKlass, setEditingKlass] = useState<{ id?: number; name?: string }>({});
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchKlasses = async () => {
@@ -49,40 +52,48 @@ const KlassManager = () => {
     };
 
     return (
-        <div>
-            <h2>Manage Klasses</h2>
-            {/* Form for creating klass */}
-            <input
-                type="text"
-                value={newKlass.name}
-                onChange={(e) => setNewKlass({ name: e.target.value })}
-                placeholder="Klass Name"
-            />
-            <button onClick={handleCreate}>Create Klass</button>
+        <div className={styles.compHome}>
+            <div className={styles.headBtn} >
+                <h2>Manage Klasses</h2>
+                {/* Button to navigate to admin page page */}
+                <button onClick={() => navigate('/admin/panel')}>Go to Home</button>
+            </div>
+            <div className={styles.inputBtn}>
+                <input
+                    type="text"
+                    value={newKlass.name}
+                    onChange={(e) => setNewKlass({name: e.target.value})}
+                    placeholder="Klass Name"
+                />
+                <button onClick={handleCreate}>Create Klass</button>
+            </div>
 
-            {/* Form for updating klass */}
             {editingKlass.id && (
                 <div>
                     <input
                         type="text"
                         value={editingKlass.name || ''}
-                        onChange={(e) => setEditingKlass({ ...editingKlass, name: e.target.value })}
+                        onChange={(e) => setEditingKlass({...editingKlass, name: e.target.value})}
                         placeholder="Update Klass Name"
                     />
                     <button onClick={handleUpdate}>Update Klass</button>
                 </div>
             )}
 
-            <h3>Existing Klasses:</h3>
-            <ul>
-                {klasses.map((klass) => (
-                    <li key={klass.id}>
-                        {klass.name}
-                        <button onClick={() => setEditingKlass({ id: klass.id, name: klass.name })}>Edit</button>
-                        <button onClick={() => handleDelete(klass.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <div className={styles.classes}>
+                <h3>Existing Klasses</h3>
+                <div className={styles.lst}>
+                    {klasses.map((klass) => (
+                        <div className={styles.list} key={klass.id}>
+                            <div className={styles.clName}>{klass.name}</div>
+                            <div className={styles.clBtn}>
+                                <button onClick={() => setEditingKlass({id: klass.id, name: klass.name})}>Edit</button>
+                                <button onClick={() => handleDelete(klass.id)}>Delete</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
