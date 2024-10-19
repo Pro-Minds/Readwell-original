@@ -1,0 +1,16 @@
+.home{
+    display: flex;
+    flex-flow: column;
+    align-items: start;
+    margin-left: 50px;
+}
+
+.home h2{
+    font-size: 18px;
+}
+.list a{
+    cursor: pointer;
+}
+.list a:hover{
+    color: #6900ff;
+}
