@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUserSubjectsByKlassId } from "../../services/userService";
+import styles from '../HomePageStyles.module.css';
 
 const SubjectList: React.FC = () => {
     const { klassId } = useParams<{ klassId: string }>();
@@ -20,18 +21,18 @@ const SubjectList: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>Subjects</h1>
+        <div className={styles.home}>
+            <h2>Subjects</h2>
             {subjects.length === 0 ? (
                 <p>No subjects available for this class.</p>
             ) : (
-                <ul>
+                <div className={styles.list}>
                     {subjects.map((subject: any) => (
-                        <li key={subject.id} onClick={() => handleSubjectClick(subject.id)}>
+                        <a key={subject.id} onClick={() => handleSubjectClick(subject.id)}>
                             {subject.name}
-                        </li>
+                        </a>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Question } from '../../services/types';
+import styles from '../HomePageStyles.module.css';
 
 interface QuizResultsProps {
     questions: Question[];
@@ -30,18 +31,18 @@ const QuizResults: React.FC<QuizResultsProps> = ({ questions, selectedAnswers })
     });
 
     return (
-        <div>
-            <h1>Quiz Results</h1>
-            <ul>
+        <div className={styles.home}>
+            <h2>Quiz Results</h2>
+            <div>
                 {results.map((result, index) => (
-                    <li key={index}>
+                    <div key={index}>
                         <p><strong>Question:</strong> {result.questionText}</p>
                         <p><strong>Your Answers:</strong> {result.userAnswers.length > 0 ? result.userAnswers.join(', ') : 'None'}</p>
                         <p><strong>Correct Answers:</strong> {result.correctAnswers.join(', ')}</p>
                         <p><strong>Status:</strong> {result.isCorrect ? 'Correct' : 'Incorrect'}</p>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
             <button onClick={() => navigate('/')}>Back to Home</button>
         </div>
     );
