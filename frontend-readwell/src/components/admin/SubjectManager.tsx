@@ -80,7 +80,7 @@ const SubjectManager = () => {
                 <button onClick={() => navigate('/admin/panel')}>Go to Home</button>
             </div>
             {/* Form for creating subject */}
-            <div className={styles.inputBtn}>
+            <div className={styles.inputBtnQ}>
                 <input
                     type="text"
                     value={newSubject.name}

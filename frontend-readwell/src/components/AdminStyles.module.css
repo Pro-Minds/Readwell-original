@@ -67,12 +67,18 @@
     display: flex;
     align-items: center;
 }
-.inputBtn {
+.inputBtnQ {
+    display: flex;
+    flex-flow: column;
+}
+.inputBtn, .inputBtnQ {
     margin-top: 50px;
 }
-.inputBtn input, .inputBtn button, .inputBtn select {
+.inputBtn input, .inputBtn button, .inputBtn select,
+.inputBtnQ input, .inputBtnQ button, .inputBtnQ select{
     padding: 10px 20px;
     border-radius: 5px;
+    margin: 5px 0;
 }
 .headBtn h2 {
     margin-right: 25px;
