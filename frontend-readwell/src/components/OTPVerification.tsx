@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getUserRole, verifyOtp } from '../services/apiService';
+import styles from './RegistrationForm.module.css';
 
 const OTPVerification: React.FC = () => {
     const [otp, setOtp] = useState('');
@@ -29,15 +30,17 @@ const OTPVerification: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className={styles.regForm} onSubmit={handleSubmit}>
+            <h1 className={styles.head}>Readwell - Admin OTP Verification</h1>
             <input
+                className={styles.input}
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 required
                 placeholder="Enter OTP"
             />
-            <button type="submit">Verify OTP</button>
+            <button className={styles.btn} type="submit">Verify OTP</button>
         </form>
     );
 };

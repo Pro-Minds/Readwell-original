@@ -4,6 +4,7 @@ import { getUserQuestionsByTopicId } from "../../services/userService";
 import { Question } from "../../services/types";
 import ReviewQuestions from './ReviewQuestions'; // Import the Review component
 import QuizResults from "./QuizResults";
+import styles from '../HomePageStyles.module.css';
 
 const QuestionList: React.FC = () => {
     const { topicId } = useParams<{ topicId: string }>();
@@ -69,9 +70,9 @@ const QuestionList: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className={styles.home}>
             {questions.length === 0 ? (
-                <h1>There are no questions for this topic at the moment.</h1>
+                <h2>There are no questions for this topic at the moment.</h2>
             ) : showResults ? (
                 <QuizResults
                     questions={questions}
@@ -79,13 +80,13 @@ const QuestionList: React.FC = () => {
                 />
             ) : !showReview ? (
                 <>
-                    <h1>Question {currentQuestionIndex + 1} of {questions.length}</h1>
+                    <h2>Question {currentQuestionIndex + 1} of {questions.length}</h2>
                     {questions[currentQuestionIndex] ? (
-                        <div>
-                            <p>{questions[currentQuestionIndex].questionText}</p>
-                            <ul>
+                        <div className={styles.questionBlock}>
+                            <p className={styles.questionText}>{questions[currentQuestionIndex].questionText}</p>
+                            <div className={styles.questionInputs}>
                                 {questions[currentQuestionIndex].options.map((option) => (
-                                    <li key={option}>
+                                    <div className={styles.questionInput} key={option}>
                                         <input
                                             type={questions[currentQuestionIndex].correctAnswers.length > 1 ? "checkbox" : "radio"}
                                             name={`question-${questions[currentQuestionIndex].id}`}
@@ -94,16 +95,26 @@ const QuestionList: React.FC = () => {
                                             checked={selectedAnswers[questions[currentQuestionIndex].id]?.includes(option) || false}
                                         />
                                         {option}
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
-                            <button onClick={() => toggleFlagQuestion(questions[currentQuestionIndex].id)}>
-                                {flaggedQuestions.has(questions[currentQuestionIndex].id) ? "Unflag" : "Flag"} as Difficult
-                            </button>
-                            <button onClick={() => setCurrentQuestionIndex(prev => Math.max(prev - 1, 0))} disabled={currentQuestionIndex === 0}>Prev</button>
-                            <button onClick={handleNextOrSubmit}>
-                                {currentQuestionIndex < questions.length - 1 ? "Next" : "Review"}
-                            </button>
+                            </div>
+                            <div className={styles.questionBtns}>
+                                <div className={styles.flagBtn}>
+                                    <button className={styles.flagBtn}
+                                            onClick={() => toggleFlagQuestion(questions[currentQuestionIndex].id)}>
+                                        {flaggedQuestions.has(questions[currentQuestionIndex].id) ? "Unflag" : "Flag"} as
+                                        Difficult
+                                    </button>
+                                </div>
+                                <div className={styles.paginationBtns}>
+                                    <button onClick={() => setCurrentQuestionIndex(prev => Math.max(prev - 1, 0))}
+                                            disabled={currentQuestionIndex === 0}>Prev
+                                    </button>
+                                    <button onClick={handleNextOrSubmit}>
+                                        {currentQuestionIndex < questions.length - 1 ? "Next" : "Review"}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     ) : null}
                 </>

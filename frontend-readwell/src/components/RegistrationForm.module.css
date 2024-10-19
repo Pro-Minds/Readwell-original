@@ -1,0 +1,24 @@
+.regForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    width: 100%;
+    height: 100%;
+}
+.head {
+    margin-bottom: 70px;
+}
+.input, .btn {
+    width: 50%;
+    padding: 10px;
+    margin: 5px 0;
+    outline: none;
+    border-radius: 10px;
+}
+.btn {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}

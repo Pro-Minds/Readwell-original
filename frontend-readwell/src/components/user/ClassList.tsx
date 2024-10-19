@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getUserKlasses } from "../../services/userService";
 import { useNavigate } from "react-router-dom";
-
+import styles from '../HomePageStyles.module.css'
 const ClassList: React.FC = () => {
     const [classes, setClasses] = useState([]);
     const navigate = useNavigate();
@@ -19,18 +19,18 @@ const ClassList: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>Classes</h1>
+        <div className={styles.home}>
+            <h2>Classes</h2>
             {classes.length === 0 ? (
                 <p>No classes available.</p> // Message when no classes exist
             ) : (
-                <ul>
+                <div className={styles.list}>
                     {classes.map((klass: any) => (
-                        <li key={klass.id} onClick={() => handleClassClick(klass.id)}>
+                        <a key={klass.id} onClick={() => handleClassClick(klass.id)}>
                             {klass.name}
-                        </li>
+                        </a>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

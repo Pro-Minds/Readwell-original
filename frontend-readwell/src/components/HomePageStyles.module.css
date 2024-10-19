@@ -1,0 +1,83 @@
+.home{
+    display: flex;
+    flex-flow: column;
+    align-items: start;
+    margin-left: 50px;
+}
+
+.home h2{
+    font-size: 18px;
+}
+.list {
+    display: flex;
+    flex-flow: column;
+}
+.list a{
+    cursor: pointer;
+    margin: 5px 0;
+}
+.list a:hover{
+    color: #6900ff;
+}
+
+.questionText {
+    font-size: 18px;
+}
+.questionInputs{
+    cursor: pointer;
+    padding: 3px 0;
+    font-size: 16px;
+}
+.questionInput{
+    padding: 4px 0;
+}
+.questionBlock{
+    width: 100%;
+}
+.questionBtns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+.flagBtn{
+    width: 25%;
+}
+.flagBtn button{
+    width: 100%;
+}
+.paginationBtns button {
+    width: 20%;
+}
+.paginationBtns{
+    width: 70%;
+    display: flex;
+    justify-content: center;
+}
+.reviewBlock {
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.label {
+    width: 90%;
+    display: flex;
+}
+.reinput{
+    width: 8%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.reviewBlock label {
+    display: flex;
+}
+.reviewBlockSubmitBtn{
+    width: 100%;
+    margin-top: 20px;
+}
+.reviewBlockSubmitBtn button {
+    width: 100%;
+    cursor: pointer;
+}

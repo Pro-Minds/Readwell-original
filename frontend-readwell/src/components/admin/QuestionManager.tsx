@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createQuestion, getQuestions, updateQuestion, deleteQuestion } from '../../services/adminService';
 import { getTopics } from '../../services/adminService';
+import styles from '../AdminStyles.module.css'
 
 const QuestionManager = () => {
     const [questions, setQuestions] = useState<any[]>([]);
@@ -12,6 +14,7 @@ const QuestionManager = () => {
         topic: { id: 0 }
     });
     const [editingQuestion, setEditingQuestion] = useState<{ id?: number; questionText?: string; options?: string[]; correctAnswers?: string[]; topic?: number }>({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -82,37 +85,45 @@ const QuestionManager = () => {
     };
 
     return (
-        <div>
-            <h2>Manage Questions</h2>
+        <div className={styles.compHome}>
+            <div className={styles.headBtn}>
+                <h2>Manage Questions</h2>
+                <button onClick={() => navigate('/admin/panel')}>Go to Home</button>
+            </div>
             {/* Form for creating question */}
-            <input
-                type="text"
-                value={newQuestion.questionText}
-                onChange={(e) => setNewQuestion({ ...newQuestion, questionText: e.target.value })}
-                placeholder="Question Text"
-            />
-            <input
-                type="text"
-                value={newQuestion.options.join(',')}
-                onChange={(e) => setNewQuestion({ ...newQuestion, options: e.target.value.split(',') })}
-                placeholder="Options (comma separated)"
-            />
-            <input
-                type="text"
-                value={newQuestion.correctAnswers.join(',')}  // Update for correctAnswers
-                onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswers: e.target.value.split(',') })}  // Update for correctAnswers
-                placeholder="Correct Answers (comma separated)"
-            />
-            <select
-                onChange={(e) => setNewQuestion({ ...newQuestion, topic: { id: parseInt(e.target.value) } })}
-                value={newQuestion.topic.id}
-            >
-                <option value={0}>Select Topic</option>
-                {topics.map(topic => (
-                    <option key={topic.id} value={topic.id}>{topic.name}</option>
-                ))}
-            </select>
-            <button onClick={handleCreate}>Create Question</button>
+            <div className={styles.inputBtnQ}>
+                <input
+                    type="text"
+                    value={newQuestion.questionText}
+                    onChange={(e) => setNewQuestion({...newQuestion, questionText: e.target.value})}
+                    placeholder="Question Text"
+                />
+                <input
+                    type="text"
+                    value={newQuestion.options.join(',')}
+                    onChange={(e) => setNewQuestion({...newQuestion, options: e.target.value.split(',')})}
+                    placeholder="Options (comma separated)"
+                />
+                <input
+                    type="text"
+                    value={newQuestion.correctAnswers.join(',')}  // Update for correctAnswers
+                    onChange={(e) => setNewQuestion({
+                        ...newQuestion,
+                        correctAnswers: e.target.value.split(',')
+                    })}  // Update for correctAnswers
+                    placeholder="Correct Answers (comma separated)"
+                />
+                <select
+                    onChange={(e) => setNewQuestion({...newQuestion, topic: {id: parseInt(e.target.value)}})}
+                    value={newQuestion.topic.id}
+                >
+                    <option value={0}>Select Topic</option>
+                    {topics.map(topic => (
+                        <option key={topic.id} value={topic.id}>{topic.name}</option>
+                    ))}
+                </select>
+                <button onClick={handleCreate}>Create Question</button>
+            </div>
 
             {/* Form for updating question */}
             {editingQuestion.id && (
@@ -120,23 +131,26 @@ const QuestionManager = () => {
                     <input
                         type="text"
                         value={editingQuestion.questionText || ''}
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, questionText: e.target.value })}
+                        onChange={(e) => setEditingQuestion({...editingQuestion, questionText: e.target.value})}
                         placeholder="Update Question Text"
                     />
                     <input
                         type="text"
                         value={editingQuestion.options?.join(',') || ''}
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, options: e.target.value.split(',') })}
+                        onChange={(e) => setEditingQuestion({...editingQuestion, options: e.target.value.split(',')})}
                         placeholder="Update Options (comma separated)"
                     />
                     <input
                         type="text"
                         value={editingQuestion.correctAnswers?.join(',') || ''}  // Update for correctAnswers
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, correctAnswers: e.target.value.split(',') })}  // Update for correctAnswers
+                        onChange={(e) => setEditingQuestion({
+                            ...editingQuestion,
+                            correctAnswers: e.target.value.split(',')
+                        })}  // Update for correctAnswers
                         placeholder="Update Correct Answers (comma separated)"
                     />
                     <select
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, topic: parseInt(e.target.value) })}
+                        onChange={(e) => setEditingQuestion({...editingQuestion, topic: parseInt(e.target.value)})}
                         value={editingQuestion.topic}
                     >
                         <option value={0}>Select Topic</option>
@@ -148,22 +162,25 @@ const QuestionManager = () => {
                 </div>
             )}
 
-            <h3>Existing Questions:</h3>
-            <ul>
-                {questions.map((question) => (
-                    <li key={question.id}>
-                        {question.questionText}
-                        <button onClick={() => setEditingQuestion({
-                            id: question.id,
-                            questionText: question.questionText,
-                            options: question.options,
-                            correctAnswers: question.correctAnswers,  // Update for correctAnswers
-                            topic: question.topic.id
-                        })}>Edit</button>
-                        <button onClick={() => handleDelete(question.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <div className={styles.classes}>
+                <h3>Existing Questions:</h3>
+                <div>
+                    {questions.map((question) => (
+                        <div key={question.id}>
+                            {question.questionText}
+                            <button onClick={() => setEditingQuestion({
+                                id: question.id,
+                                questionText: question.questionText,
+                                options: question.options,
+                                correctAnswers: question.correctAnswers,  // Update for correctAnswers
+                                topic: question.topic.id
+                            })}>Edit
+                            </button>
+                            <button onClick={() => handleDelete(question.id)}>Delete</button>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
