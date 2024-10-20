@@ -4,9 +4,6 @@ LABEL authors="sinke"
 # Set the working directory
 WORKDIR /app
 
-# Copy the .env file from the root directory
-COPY .env ./
-
 # Copy the Maven wrapper and pom.xml
 COPY backend-readwell/mvnw .
 COPY backend-readwell/.mvn .mvn
