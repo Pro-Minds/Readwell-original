@@ -2,6 +2,8 @@
 
 spring:
   application:
+    config:
+      import: import:optional:file:.env[.yml]
     name: backend-readwell
     security:
       jwt:
