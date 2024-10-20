@@ -5,12 +5,12 @@ spring:
     name: backend-readwell
     security:
       jwt:
-        secret-key: xPaGg4XP2BF7t88wPCRwS78m36KQ06gf0TTjkAam/Viuvq1L2nagwW3HS36r0m/Sfjz/7ZXQjhEv9D24uVtZ2w==
-        expiration: 3600000 # 1 hour in milliseconds
+        secret-key: ${SPRING_SECURITY_JWT_SECRET_KEY}
+        expiration: ${SPRING_SECURITY_JWT_EXPIRATION}
   datasource:
-    url: jdbc:postgresql://postgres:5432/readwell-db
-    username: admin
-    password: admin
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -24,20 +24,20 @@ spring:
       password: test
       name: test
   mail:
-    host: readwell-mail-dev
-    port: 1025
-    username: ulga
-    password: ulga
+    host: ${SPRING_MAIL_HOST}
+    port: ${SPRING_MAIL_PORT}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
           trust: "*"
-        auth: true
-        starttls:
-          enable: true
-        connectiontimeout: 5000
-        timeout: 3000
-        writetimeout: 5000
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
 cors:
   allowed-origins: "${ALLOWED_ORIGINS:http://localhost:3000,http://readwell-UI:3000}"
