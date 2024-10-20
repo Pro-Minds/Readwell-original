@@ -29,15 +29,34 @@ jobs:
           TAG=$(git tag --sort=-creatordate | head -n 1)
           if [ -z "$TAG" ]; then
             echo "NO tag on the repo, please create a tag"
-            exit 1
-          else
-            echo "Latest Tag: $TAG"
-            echo "TAG=$TAG" >> $GITHUB_ENV
+            TAG="v0.1"  # Default to v0.1 if no tags exist
+          fi
+          echo "Latest Tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Increment Tag
+        id: increment_tag
+        run: |
+          TAG=${{ env.TAG }}
+          # Extract the version number and increment it
+          VERSION_NUMBER=$(echo $TAG | grep -o '[0-9]\+$')
+          BASE_VERSION=$(echo $TAG | sed 's/[0-9]\+$//')
+          NEW_VERSION_NUMBER=$((VERSION_NUMBER + 1))
+          NEW_TAG="${BASE_VERSION}${NEW_VERSION_NUMBER}"
+          
+          # Check if the new tag already exists
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "Tag $NEW_TAG already exists. Incrementing again..."
+            NEW_VERSION_NUMBER=$((NEW_VERSION_NUMBER + 1))
+            NEW_TAG="${BASE_VERSION}${NEW_VERSION_NUMBER}"
           fi
 
-      - name: Debug Tag
+          echo "New Tag: $NEW_TAG"
+          echo "TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Debug New Tag
         run: |
-          echo "Current TAG is: ${{ env.TAG }}"
+          echo "Current New TAG is: ${{ env.TAG }}"
 
       - name: Build and push backend image
         run: |
