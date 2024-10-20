@@ -108,6 +108,64 @@ networks:
     driver: bridge
 ```
 
+The `src/main/resources/application.yml`
+```env
+# TODO: changes changes before production
+
+spring:
+  application:
+    name: backend-readwell
+    security:
+      jwt:
+        secret-key: ${SPRING_SECURITY_JWT_SECRET_KEY}
+        expiration: ${SPRING_SECURITY_JWT_EXPIRATION}
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  sql:
+    init:
+      mode: always
+  security:
+    user:
+      password: test
+      name: test
+  mail:
+    host: ${SPRING_MAIL_HOST}
+    port: ${SPRING_MAIL_PORT}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+cors:
+  allowed-origins: "${ALLOWED_ORIGINS:http://localhost:3000,http://readwell-UI:3000}"
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.mail: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+```
+
 ### Environment Variables
 
 The `.env` file contains the following variables:
