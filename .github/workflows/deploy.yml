@@ -43,13 +43,6 @@ jobs:
           BASE_VERSION=$(echo $TAG | sed 's/[0-9]\+$//')
           NEW_VERSION_NUMBER=$((VERSION_NUMBER + 1))
           NEW_TAG="${BASE_VERSION}${NEW_VERSION_NUMBER}"
-          
-          # Check if the new tag already exists
-          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
-            echo "Tag $NEW_TAG already exists. Incrementing again..."
-            NEW_VERSION_NUMBER=$((NEW_VERSION_NUMBER + 1))
-            NEW_TAG="${BASE_VERSION}${NEW_VERSION_NUMBER}"
-          fi
 
           echo "New Tag: $NEW_TAG"
           echo "TAG=$NEW_TAG" >> $GITHUB_ENV
