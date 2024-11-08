@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: sinke237/19-oct-24-readwell-db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  frontend:
+    image: sinke237/frontend:v0.5
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - REACT_APP_USER_API_URL=${REACT_APP_USER_API_URL}
+    ports:
+      - "3000:3000"
+
+  backend:
+    image: sinke237/backend:v0.5
+    env_file:
+      - .env
+#    volumes:
+#      - ./.env:/app/.env
+    ports:
+      - "8080:8080"
+    command: [ "wait-for-it", "readwell_db:5432", "--timeout=30", "--", "java", "-jar", "target/backend-readwell-0.0.1-SNAPSHOT.jar" ]
+
+  readwell-mail-dev:
+    image: sinke237/readwell-v2_mail-dev
+    environment:
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_MAIL_PORT=${SPRING_MAIL_PORT}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+    ports:
+      - "1080:1080"
