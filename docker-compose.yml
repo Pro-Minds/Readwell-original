@@ -36,8 +36,8 @@ services:
   backend:
     container_name: readwell-server
     build:
-      context: .
-      dockerfile: Dockerfile.backend-readwell
+      context: ./backend-readwell
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     networks:
@@ -73,6 +73,7 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   readwell-net:
