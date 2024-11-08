@@ -1,4 +1,4 @@
-# Dockerfile
+# Build Stage
 FROM node:20 as build
 LABEL authors="sinke"
 
@@ -18,7 +18,7 @@ COPY . .
 ARG REACT_APP_API_URL
 ARG REACT_APP_USER_API_URL
 
-# Build the application with environment variables
+# Build the application with environment variables (used during build time)
 RUN REACT_APP_API_URL=$REACT_APP_API_URL REACT_APP_USER_API_URL=$REACT_APP_USER_API_URL npm run build
 
 
@@ -37,5 +37,9 @@ COPY --from=build /app/build /app/build
 # Expose the port on which the app will run
 EXPOSE 3000
 
-# Serve the app
+# Set runtime environment variables (useful for overriding in the running container)
+ENV REACT_APP_API_URL=http://localhost:8080/api
+ENV REACT_APP_USER_API_URL=http://localhost:8080/api/user
+
+# Command to serve the app
 CMD ["serve", "-s", "build", "-l", "3000"]
