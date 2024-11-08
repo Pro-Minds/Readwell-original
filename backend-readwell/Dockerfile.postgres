@@ -1,8 +1,20 @@
-# Dockerfile.postgres
+# Use the official PostgreSQL image as a base
 FROM postgres:latest
 
-# Expose the port
-EXPOSE 5432
+# Set the working directory
+WORKDIR /docker-entrypoint-initdb.d
+
+# Copy your backup file into the container
+COPY 19_Oct_24.backup /docker-entrypoint-initdb.d/19_Oct_24.backup
+
+# Make sure PostgreSQL has permissions to read the file
+RUN chmod 755 /docker-entrypoint-initdb.d/19_Oct_24.backup
+
+# Set environment variables for PostgreSQL (optional, if you need custom credentials)
+# These will be used for creating the DB during container initialization.
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=admin
+ENV POSTGRES_DB=readwell-db
 
 # Add healthcheck
 HEALTHCHECK CMD pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
